@@ -14,7 +14,7 @@ Daniel Bondarkov, 2021
 * Project managment is implemented using Trello service.
 
 > **Justification of such choose:**
-> *Trello* is a convenient mean for small project managment. It gives big amount of tools and these tools are enough for purposes of my project.
+> *Trello* is a convenient mean for small project managment. It gives big amount of tools and these tools are enough for purposes of my project.  
 > *Asana* is also great utility for project managment, and it has even more functionality compared with Trello, it's more for big projects with big team of developers. 
 
 * This is gonna be a web service where users can search and buy vehicles and sell their ones.  
