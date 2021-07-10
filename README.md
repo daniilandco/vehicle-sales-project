@@ -7,11 +7,11 @@ Daniel Bondarkov, 2021
 
 #### Upkeep of the project
 
-1. [Common information about the project](#common-info)
+1. [Common information](#common-info)
 
 2. [Technical information](#tech-info)
 
-3. [Ideas or features which are being considered for inplementing](#features)
+3. [Ideas or features](#features)
 
 ***
 
