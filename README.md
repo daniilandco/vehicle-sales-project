@@ -5,7 +5,7 @@ Daniel Bondarkov, 2021
 
 ***
 
-#### Upkeep of the project
+#### Content of the project
 
 1. [Common information](#common-info)
 
@@ -57,33 +57,58 @@ Daniel Bondarkov, 2021
 
 #### Ideas or features which are being considered for inplementing
 
-Of course, users should can search ads which are suitable for their needs. It can be implemented with ad search filter.  
+Of course, users should have opportunity to search ads which are suitable for their needs. It can be implemented with ad search filter.  
 
 
 ***1. Parameters for ad search filter***
 
-- [ ] type of vehicle (car, motorbike, tractor etc.)
-- [ ] brand
-- [ ] model
-- [ ] release year
-- [ ] price range
-- [ ] ad location (city or region where to search an ad)  
+- [ ] type of vehicle (car, motorbike, tractor etc.) {car}
+- [ ] brand {audi}
+- [ ] model {A8 D4}
+- [ ] release year {2015}
+- [ ] price range {10 - 15$ thousand}
+- [ ] ad's location {Minsk}
 
+> Note: the content in { ... } is just a sample.
 
 ***2. Unregistered users can do***
 
-- [ ] sign up
-- [ ] check any ad out
+* signing up
+    - [ ] phone number
+    - [ ] email
+    - [ ] password
+    - [ ] name
+- [ ] search and watch any ad out
 - [ ] check common information about the service  
 
 
 ***3. Registered users can do (additionally)***
 
-- [ ] sign in
-- [ ] log out
-- [ ] change account parameters (name, login, password etc.)
-- [ ] create and maintain own ads
-- [ ] have message conversations with other users
-- [ ] have personal money account for purchasing
-- [ ] top up an money account using credit cards and/or E-money
-- [ ] purchase item if it is marked with the sign "can be bought online"
+* Authentication
+    - [ ] sign in
+    - [ ] log out
+
+* Editing account parameters
+    - [ ] edit name
+    - [ ] edit phone number
+    - [ ] edit login
+    - [ ] edit password
+    
+* Creating own ads
+    - [ ] create an ad
+    - [ ] watch list of all ads
+    - [ ] maintain an ad
+
+* Ad maintaining
+    - [ ] attach photos of an vehicle
+    - [ ] edit description of an ad
+    - [ ] edit cost of an vehicle
+    - [ ] edit title of an ad
+
+* Buy vehicle online 
+    - [ ] have personal money account for purchasing
+    - [ ] top up a money account using credit cards and/or E-money
+    - [ ] purchase item if it is marked with the sign "can be bought online"
+
+* Other features
+    - [ ] have message conversations with other users
