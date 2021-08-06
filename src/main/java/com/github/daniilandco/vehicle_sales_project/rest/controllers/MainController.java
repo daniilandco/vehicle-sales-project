@@ -1,4 +1,4 @@
-package com.github.daniilandco.vehicle_sales_project.rest;
+package com.github.daniilandco.vehicle_sales_project.rest.controllers;
 
 import com.github.daniilandco.vehicle_sales_project.database_access.ad.Ad;
 import com.github.daniilandco.vehicle_sales_project.database_access.ad.AdRepository;

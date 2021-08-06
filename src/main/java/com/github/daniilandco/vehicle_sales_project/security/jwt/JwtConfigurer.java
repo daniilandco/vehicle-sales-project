@@ -1,4 +1,4 @@
-package com.github.daniilandco.vehicle_sales_project.security;
+package com.github.daniilandco.vehicle_sales_project.security.jwt;
 
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

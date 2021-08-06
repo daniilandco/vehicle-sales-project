@@ -1,4 +1,4 @@
-package com.github.daniilandco.vehicle_sales_project.security;
+package com.github.daniilandco.vehicle_sales_project.security.jwt;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

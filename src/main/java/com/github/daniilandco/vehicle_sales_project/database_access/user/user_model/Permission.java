@@ -1,4 +1,4 @@
-package com.github.daniilandco.vehicle_sales_project.user_model;
+package com.github.daniilandco.vehicle_sales_project.database_access.user.user_model;
 
 public enum Permission {
     USERS_READ("users:read"),

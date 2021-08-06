@@ -1,9 +1,13 @@
-package com.github.daniilandco.vehicle_sales_project.rest;
+package com.github.daniilandco.vehicle_sales_project.rest.controllers;
 
 import com.github.daniilandco.vehicle_sales_project.config.SecurityConfig;
 import com.github.daniilandco.vehicle_sales_project.database_access.user.User;
 import com.github.daniilandco.vehicle_sales_project.database_access.user.UserRepository;
-import com.github.daniilandco.vehicle_sales_project.security.JwtTokenProvider;
+import com.github.daniilandco.vehicle_sales_project.rest.login.LoginRequest;
+import com.github.daniilandco.vehicle_sales_project.rest.login.LoginResponse;
+import com.github.daniilandco.vehicle_sales_project.rest.register.RegisterRequest;
+import com.github.daniilandco.vehicle_sales_project.rest.register.RegisterResponse;
+import com.github.daniilandco.vehicle_sales_project.security.jwt.JwtTokenProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

@@ -1,7 +1,7 @@
 package com.github.daniilandco.vehicle_sales_project.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.daniilandco.vehicle_sales_project.user_model.Status;
+import com.github.daniilandco.vehicle_sales_project.database_access.user.user_model.Status;
 import com.github.daniilandco.vehicle_sales_project.database_access.user.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;

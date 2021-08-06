@@ -1,7 +1,7 @@
 package com.github.daniilandco.vehicle_sales_project.database_access.user;
 
-import com.github.daniilandco.vehicle_sales_project.user_model.Role;
-import com.github.daniilandco.vehicle_sales_project.user_model.Status;
+import com.github.daniilandco.vehicle_sales_project.database_access.user.user_model.Role;
+import com.github.daniilandco.vehicle_sales_project.database_access.user.user_model.Status;
 import lombok.Data;
 
 import javax.persistence.*;

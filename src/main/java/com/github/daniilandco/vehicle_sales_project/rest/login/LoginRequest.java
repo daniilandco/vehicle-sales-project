@@ -1,4 +1,4 @@
-package com.github.daniilandco.vehicle_sales_project.rest;
+package com.github.daniilandco.vehicle_sales_project.rest.login;
 
 import lombok.Data;
 
