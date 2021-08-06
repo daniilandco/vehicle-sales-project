@@ -100,9 +100,9 @@ Of course, users should have opportunity to search ads which are suitable for th
     - [ ] maintain an ad
 
 * Ad maintaining
-    - [ ] attach photos of an vehicle
+    - [ ] attach photos of a vehicle
     - [ ] edit description of an ad
-    - [ ] edit cost of an vehicle
+    - [ ] edit cost of a vehicle
     - [ ] edit title of an ad
 
 * Buy vehicle online 
