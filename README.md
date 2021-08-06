@@ -84,9 +84,9 @@ Of course, users should have opportunity to search ads which are suitable for th
 
 ***3. Registered users can do (additionally)***
 
-* Authentication
-    - [ ] sign in
-    - [ ] log out
+* Authorization
+    - [x] sign in
+    - [x] log out
 
 * Editing account parameters
     - [ ] edit name
