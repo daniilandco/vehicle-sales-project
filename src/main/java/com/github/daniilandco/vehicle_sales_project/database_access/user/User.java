@@ -54,4 +54,19 @@ public class User {
     @Column(name = "last_login")
     private Timestamp lastLogin;
 
+    public User() {
+    }
+
+    public User(String firstName, String secondName, String email, String phoneNumber, String password, Status status, Role role) {
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.status = status;
+        this.role = role;
+        this.firstName = firstName;
+        this.secondName = secondName;
+        this.registeredAt = this.lastLogin = new Timestamp(System.currentTimeMillis());
+        this.location = this.profilePhoto = null;
+        this.id = null;
+    }
 }

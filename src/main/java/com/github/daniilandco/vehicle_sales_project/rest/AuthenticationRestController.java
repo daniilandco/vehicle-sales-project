@@ -1,5 +1,6 @@
 package com.github.daniilandco.vehicle_sales_project.rest;
 
+import com.github.daniilandco.vehicle_sales_project.config.SecurityConfig;
 import com.github.daniilandco.vehicle_sales_project.database_access.user.User;
 import com.github.daniilandco.vehicle_sales_project.database_access.user.UserRepository;
 import com.github.daniilandco.vehicle_sales_project.security.JwtTokenProvider;
@@ -30,16 +31,42 @@ public class AuthenticationRestController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
         String token = jwtTokenProvider.createToken(request.getEmail(), user.getRole().name());
-        return ResponseEntity.ok(new AuthenticationResponse(token, request.getEmail()));
+        return ResponseEntity.ok(new LoginResponse(token, request.getEmail()));
     }
 
     @PostMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
         securityContextLogoutHandler.logout(request, response, null);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new RegisterResponse("Error: Username already exists"));
+        }
+
+        if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new RegisterResponse("Error: Phone number already exists"));
+        }
+
+        User user = new User(
+                request.getFirstName(), request.getSecondName(),
+                request.getEmail(), request.getPhoneNumber(),
+                SecurityConfig.passwordEncoder().encode(request.getPassword()),
+                request.getStatus(), request.getRole()
+        );
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new RegisterResponse("User is registered"));
     }
 }
