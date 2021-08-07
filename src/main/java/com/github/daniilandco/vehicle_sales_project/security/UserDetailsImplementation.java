@@ -13,9 +13,13 @@ import java.util.List;
 
 @Data
 public class UserDetailsImplementation implements UserDetails {
+    private static final long serialVersionUID = 1L;
+
     private final String username;
+
     @JsonIgnore
     private final String password;
+
     private final List<SimpleGrantedAuthority> authorities;
     private final boolean isActive;
 

@@ -1,6 +1,5 @@
 package com.github.daniilandco.vehicle_sales_project.rest.controllers;
 
-import com.github.daniilandco.vehicle_sales_project.config.SecurityConfig;
 import com.github.daniilandco.vehicle_sales_project.database_access.user.User;
 import com.github.daniilandco.vehicle_sales_project.database_access.user.UserRepository;
 import com.github.daniilandco.vehicle_sales_project.rest.login.LoginRequest;
@@ -11,6 +10,7 @@ import com.github.daniilandco.vehicle_sales_project.security.jwt.JwtTokenProvide
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.sql.Timestamp;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -36,8 +37,19 @@ public class AuthenticationRestController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    request.getEmail(), request.getPassword()));
+        } catch (AuthenticationException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(e.getMessage());
+        }
+
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
+        user.setLastLogin(new Timestamp(System.currentTimeMillis()));
+        userRepository.save(user);
+
         String token = jwtTokenProvider.createToken(request.getEmail(), user.getRole().name());
         return ResponseEntity.ok(new LoginResponse(token, request.getEmail()));
     }
@@ -53,23 +65,21 @@ public class AuthenticationRestController {
         if (userRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new RegisterResponse("Error: Username already exists"));
+                    .body(new RegisterResponse("Error: Email already exists"));
         }
-
         if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             return ResponseEntity
                     .badRequest()
                     .body(new RegisterResponse("Error: Phone number already exists"));
         }
 
-        User user = new User(
-                request.getFirstName(), request.getSecondName(),
-                request.getEmail(), request.getPhoneNumber(),
-                SecurityConfig.passwordEncoder().encode(request.getPassword()),
-                request.getStatus(), request.getRole()
-        );
-
-        userRepository.save(user);
+        try {
+            userRepository.save(request.getUser());
+        } catch (Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new RegisterResponse("Registration error"));
+        }
 
         return ResponseEntity.ok(new RegisterResponse("User is registered"));
     }

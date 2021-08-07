@@ -1,7 +1,5 @@
 package com.github.daniilandco.vehicle_sales_project.rest.controllers;
 
-import com.github.daniilandco.vehicle_sales_project.database_access.ad.Ad;
-import com.github.daniilandco.vehicle_sales_project.database_access.ad.AdRepository;
 import com.github.daniilandco.vehicle_sales_project.database_access.user.User;
 import com.github.daniilandco.vehicle_sales_project.database_access.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

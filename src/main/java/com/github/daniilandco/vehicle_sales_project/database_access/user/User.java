@@ -11,8 +11,8 @@ import java.sql.Timestamp;
 @Entity // This tells Hibernate to make a table out of this class
 @Table(name = "users",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = "email"),
-                @UniqueConstraint(columnNames = "phone_number")
+                @UniqueConstraint(columnNames = "email", name = "email"),
+                @UniqueConstraint(columnNames = "phone_number", name = "phone_number")
         })
 public class User {
     @Id
