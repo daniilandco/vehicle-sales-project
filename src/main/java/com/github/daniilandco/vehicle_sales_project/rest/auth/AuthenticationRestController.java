@@ -1,11 +1,11 @@
-package com.github.daniilandco.vehicle_sales_project.rest.controllers;
+package com.github.daniilandco.vehicle_sales_project.rest.auth;
 
 import com.github.daniilandco.vehicle_sales_project.database_access.user.User;
 import com.github.daniilandco.vehicle_sales_project.database_access.user.UserRepository;
-import com.github.daniilandco.vehicle_sales_project.rest.login.LoginRequest;
-import com.github.daniilandco.vehicle_sales_project.rest.login.LoginResponse;
-import com.github.daniilandco.vehicle_sales_project.rest.register.RegisterRequest;
-import com.github.daniilandco.vehicle_sales_project.rest.register.RegisterResponse;
+import com.github.daniilandco.vehicle_sales_project.rest.auth.login.LoginRequest;
+import com.github.daniilandco.vehicle_sales_project.rest.auth.login.LoginResponse;
+import com.github.daniilandco.vehicle_sales_project.rest.auth.register.RegisterRequest;
+import com.github.daniilandco.vehicle_sales_project.rest.auth.register.RegisterResponse;
 import com.github.daniilandco.vehicle_sales_project.security.jwt.JwtTokenProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -65,12 +65,12 @@ public class AuthenticationRestController {
         if (userRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new RegisterResponse("Error: Email already exists"));
+                    .body(new RegisterResponse(HttpServletResponse.SC_BAD_REQUEST, "Email already exists"));
         }
         if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new RegisterResponse("Error: Phone number already exists"));
+                    .body(new RegisterResponse(HttpServletResponse.SC_BAD_REQUEST, "Phone number already exists"));
         }
 
         try {
@@ -78,9 +78,9 @@ public class AuthenticationRestController {
         } catch (Exception e) {
             return ResponseEntity
                     .badRequest()
-                    .body(new RegisterResponse("Registration error"));
+                    .body(new RegisterResponse(HttpServletResponse.SC_BAD_REQUEST, "Registration error"));
         }
 
-        return ResponseEntity.ok(new RegisterResponse("User is registered"));
+        return ResponseEntity.ok(new RegisterResponse(HttpServletResponse.SC_CREATED, "User is registered"));
     }
 }

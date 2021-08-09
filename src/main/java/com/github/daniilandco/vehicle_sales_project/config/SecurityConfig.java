@@ -18,8 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${jwt.encryptionStrength}")
-    private static int encryptionStrength;
+
+    private static int encryptionStrength = 12;
 
     private final JwtConfigurer jwtConfigurer;
 

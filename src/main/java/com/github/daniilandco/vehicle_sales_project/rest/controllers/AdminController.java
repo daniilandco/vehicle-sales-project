@@ -10,18 +10,18 @@ import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/api")
-public class MainController {
+public class AdminController {
     @Autowired
     private UserRepository userRepository;
 
     @GetMapping("/users")
-    @PreAuthorize("hasAuthority('users:write')")
+    @PreAuthorize("hasAuthority('admins:manage')")
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     @GetMapping("/users/{id}")
-    @PreAuthorize("hasAuthority('users:write')")
+    @PreAuthorize("hasAuthority('admins:manage')")
     public User getById(@PathVariable Long id) {
         return StreamSupport.stream(userRepository.findAll().spliterator(), false).
                 filter(user -> user.getId().equals(id))
@@ -30,14 +30,14 @@ public class MainController {
     }
 
     @PostMapping("/users")
-    @PreAuthorize("hasAuthority('users:write')")
+    @PreAuthorize("hasAuthority('admins:manage')")
     public User addUser(@RequestBody User user) {
         userRepository.save(user);
         return user;
     }
 
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("hasAuthority('users:write')")
+    @PreAuthorize("hasAuthority('admins:manage')")
     public void deleteById(@PathVariable Long id) {
         userRepository.deleteById(id);
     }

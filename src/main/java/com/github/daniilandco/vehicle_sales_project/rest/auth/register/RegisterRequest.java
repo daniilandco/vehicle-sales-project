@@ -1,4 +1,4 @@
-package com.github.daniilandco.vehicle_sales_project.rest.register;
+package com.github.daniilandco.vehicle_sales_project.rest.auth.register;
 
 import com.github.daniilandco.vehicle_sales_project.config.SecurityConfig;
 import com.github.daniilandco.vehicle_sales_project.database_access.user.User;
