@@ -12,7 +12,7 @@ import java.util.Collection;
 
 @Data // Creates getters and setters for all fields
 @Entity // This tells Hibernate to make a table out of this class
-@Table(name = "users",
+@Table(name = "Users",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "email", name = "email"),
                 @UniqueConstraint(columnNames = "phone_number", name = "phone_number")

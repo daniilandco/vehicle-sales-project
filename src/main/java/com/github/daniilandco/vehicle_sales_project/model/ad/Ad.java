@@ -8,7 +8,7 @@ import java.time.Year;
 
 @Data
 @Entity // This tells Hibernate to make a table out of this class
-@Table(name = "ad")
+@Table(name = "Ad")
 public class Ad {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
