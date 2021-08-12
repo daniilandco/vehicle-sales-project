@@ -1,9 +1,9 @@
-package com.github.daniilandco.vehicle_sales_project.rest.auth.register;
+package com.github.daniilandco.vehicle_sales_project.controller.request;
 
 import com.github.daniilandco.vehicle_sales_project.config.SecurityConfig;
-import com.github.daniilandco.vehicle_sales_project.database_access.user.User;
-import com.github.daniilandco.vehicle_sales_project.database_access.user.user_model.Role;
-import com.github.daniilandco.vehicle_sales_project.database_access.user.user_model.Status;
+import com.github.daniilandco.vehicle_sales_project.model.user.Role;
+import com.github.daniilandco.vehicle_sales_project.model.user.Status;
+import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import lombok.Data;
 
 import javax.persistence.EnumType;
@@ -31,5 +31,4 @@ public class RegisterRequest {
                 this.getStatus(), this.getRole()
         );
     }
-
 }

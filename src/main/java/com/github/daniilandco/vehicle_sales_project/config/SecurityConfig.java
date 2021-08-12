@@ -1,7 +1,6 @@
 package com.github.daniilandco.vehicle_sales_project.config;
 
 import com.github.daniilandco.vehicle_sales_project.security.jwt.JwtConfigurer;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
 
     private static int encryptionStrength = 12;
 
@@ -35,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/auth/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

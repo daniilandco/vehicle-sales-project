@@ -1,11 +1,14 @@
-package com.github.daniilandco.vehicle_sales_project.database_access.user;
+package com.github.daniilandco.vehicle_sales_project.model.user;
 
-import com.github.daniilandco.vehicle_sales_project.database_access.user.user_model.Role;
-import com.github.daniilandco.vehicle_sales_project.database_access.user.user_model.Status;
 import lombok.Data;
-
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
+import java.io.Serial;
 import java.sql.Timestamp;
+import java.util.Collection;
 
 @Data // Creates getters and setters for all fields
 @Entity // This tells Hibernate to make a table out of this class
@@ -14,7 +17,7 @@ import java.sql.Timestamp;
                 @UniqueConstraint(columnNames = "email", name = "email"),
                 @UniqueConstraint(columnNames = "phone_number", name = "phone_number")
         })
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -49,10 +52,16 @@ public class User {
     private String location;
 
     @Column(name = "registered_at")
+    @CreationTimestamp
     private Timestamp registeredAt;
 
     @Column(name = "last_login")
+    @UpdateTimestamp
     private Timestamp lastLogin;
+
+    @Serial
+    @Transient
+    private static final long serialVersionUID = 1L;
 
     public User() {
     }
@@ -65,8 +74,55 @@ public class User {
         this.role = role;
         this.firstName = firstName;
         this.secondName = secondName;
-        this.registeredAt = this.lastLogin = new Timestamp(System.currentTimeMillis());
-        this.location = this.profilePhoto = null;
-        this.id = null;
+    }
+
+    public boolean isActive() {
+        return status.equals(Status.ACTIVE);
+    }
+
+    public UserDetails getUserDetails() {
+        return new org.springframework.security.core.userdetails.User(
+                this.getEmail(), this.getPassword(),
+                this.isActive(),
+                this.isActive(),
+                this.isActive(),
+                this.isActive(),
+                this.getRole().getAuthorities()
+        );
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.getRole().getAuthorities();
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return getEmail();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return isActive();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return isActive();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return isActive();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActive();
     }
 }

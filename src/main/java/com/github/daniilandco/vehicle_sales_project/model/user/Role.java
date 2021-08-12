@@ -1,4 +1,4 @@
-package com.github.daniilandco.vehicle_sales_project.database_access.user.user_model;
+package com.github.daniilandco.vehicle_sales_project.model.user;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -23,6 +23,5 @@ public enum Role {
         return getPermission().stream()
                 .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))
                 .collect(Collectors.toSet());
-
     }
 }

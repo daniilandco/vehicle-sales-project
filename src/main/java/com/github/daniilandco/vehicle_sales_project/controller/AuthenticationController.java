@@ -1,11 +1,12 @@
-package com.github.daniilandco.vehicle_sales_project.rest.auth;
+package com.github.daniilandco.vehicle_sales_project.controller;
 
-import com.github.daniilandco.vehicle_sales_project.database_access.user.User;
-import com.github.daniilandco.vehicle_sales_project.database_access.user.UserRepository;
-import com.github.daniilandco.vehicle_sales_project.rest.auth.login.LoginRequest;
-import com.github.daniilandco.vehicle_sales_project.rest.auth.login.LoginResponse;
-import com.github.daniilandco.vehicle_sales_project.rest.auth.register.RegisterRequest;
-import com.github.daniilandco.vehicle_sales_project.rest.auth.register.RegisterResponse;
+import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.model.user.User;
+import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
+import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequest;
+import com.github.daniilandco.vehicle_sales_project.controller.response.LoginResponse;
+import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
+import com.github.daniilandco.vehicle_sales_project.controller.response.RegisterResponse;
 import com.github.daniilandco.vehicle_sales_project.security.jwt.JwtTokenProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,20 +24,20 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 
 @RestController
-@RequestMapping("/api/auth")
-public class AuthenticationRestController {
+@RequestMapping("/auth")
+public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private JwtTokenProvider jwtTokenProvider;
 
-    public AuthenticationRestController(AuthenticationManager authenticationManager, UserRepository userRepository, JwtTokenProvider jwtTokenProvider) {
+    public AuthenticationController(AuthenticationManager authenticationManager, UserRepository userRepository, JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) throws JwtAuthenticationException {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     request.getEmail(), request.getPassword()));
@@ -50,7 +51,7 @@ public class AuthenticationRestController {
         user.setLastLogin(new Timestamp(System.currentTimeMillis()));
         userRepository.save(user);
 
-        String token = jwtTokenProvider.createToken(request.getEmail(), user.getRole().name());
+        String token = jwtTokenProvider.createToken(request.getEmail());
         return ResponseEntity.ok(new LoginResponse(token, request.getEmail()));
     }
 

@@ -1,4 +1,4 @@
-package com.github.daniilandco.vehicle_sales_project.rest.auth.register;
+package com.github.daniilandco.vehicle_sales_project.controller.response;
 
 import lombok.Data;
 
@@ -15,5 +15,4 @@ public class RegisterResponse {
         this.message = message;
         this.response = responseStatus;
     }
-
 }

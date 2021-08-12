@@ -1,8 +1,8 @@
-package com.github.daniilandco.vehicle_sales_project.database_access.user.user_model;
+package com.github.daniilandco.vehicle_sales_project.model.user;
 
 public enum Permission {
-    MANAGE("admins:manage"),   // These permissions are temp. so far : in progress
-    USE("users:use");
+    MANAGE("manage"),   // These permissions are temp. so far : in progress
+    USE("use");
 
     private final String permission;
 
@@ -14,3 +14,4 @@ public enum Permission {
         return permission;
     }
 }
+

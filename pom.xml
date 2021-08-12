@@ -18,6 +18,7 @@
 		<jjwt.version>0.9.1</jjwt.version>
 	</properties>
 	<dependencies>
+
 		<!-- database support -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

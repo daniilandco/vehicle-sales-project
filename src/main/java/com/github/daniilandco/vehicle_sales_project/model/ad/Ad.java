@@ -1,7 +1,6 @@
-package com.github.daniilandco.vehicle_sales_project.database_access.ad;
+package com.github.daniilandco.vehicle_sales_project.model.ad;
 
 import lombok.Data;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -41,5 +40,4 @@ public class Ad {
 
     public Ad() {
     }
-
 }

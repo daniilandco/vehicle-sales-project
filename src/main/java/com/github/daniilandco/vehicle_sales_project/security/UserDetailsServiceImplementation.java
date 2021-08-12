@@ -1,7 +1,7 @@
 package com.github.daniilandco.vehicle_sales_project.security;
 
-import com.github.daniilandco.vehicle_sales_project.database_access.user.User;
-import com.github.daniilandco.vehicle_sales_project.database_access.user.UserRepository;
+import com.github.daniilandco.vehicle_sales_project.model.user.User;
+import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,6 +21,6 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException("User doesn't exists"));
-        return UserDetailsImplementation.fromUser(user);
+        return user.getUserDetails();
     }
 }
