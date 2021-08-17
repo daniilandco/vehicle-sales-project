@@ -74,19 +74,19 @@ Of course, users should have opportunity to search ads which are suitable for th
 ***2. Unregistered users can do***
 
 * signing up
-    - [ ] phone number
-    - [ ] email
-    - [ ] password
-    - [ ] name
+    - [x] phone number
+    - [x] email
+    - [x] password
+    - [x] name
 - [ ] search and watch any ad out
-- [ ] check common information about the service  
+- [ ] find out common information about the service  
 
 
 ***3. Registered users can do (additionally)***
 
-* Authentication
-    - [ ] sign in
-    - [ ] log out
+* Authorization
+    - [x] sign in
+    - [x] log out
 
 * Editing account parameters
     - [ ] edit name
