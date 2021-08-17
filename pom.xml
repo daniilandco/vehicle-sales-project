@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.github.daniilandco</groupId>
-	<artifactId>spring-boot-initial</artifactId>
+	<artifactId>vehicle-sales-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>spring-boot-initial</name>
+	<name>vehicle-sales-service</name>
 	<description>Vehicle sales service project</description>
 	<properties>
 		<java.version>16</java.version>
