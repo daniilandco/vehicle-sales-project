@@ -13,14 +13,12 @@ import java.util.stream.StreamSupport;
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private AdRepository adRepository;
 
-    public AdminController(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @GetMapping("/users")
     public Iterable<User> getAllUsers() {
@@ -33,9 +31,17 @@ public class AdminController {
     }
 
     @GetMapping("/users/{id}")
-    public User getById(@PathVariable Long id) {
+    public User getUserById(@PathVariable Long id) {
         return StreamSupport.stream(userRepository.findAll().spliterator(), false).
                 filter(user -> user.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @GetMapping("/ads/{id}")
+    public Ad getAdById(@PathVariable Long id) {
+        return StreamSupport.stream(adRepository.findAll().spliterator(), false).
+                filter(ad -> ad.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
