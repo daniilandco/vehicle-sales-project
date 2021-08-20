@@ -1,13 +1,13 @@
 package com.github.daniilandco.vehicle_sales_project.controller;
 
-import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequest;
+import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
+import com.github.daniilandco.vehicle_sales_project.controller.response.SuccessLoginResponse;
+import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
-import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequest;
-import com.github.daniilandco.vehicle_sales_project.controller.response.LoginResponse;
-import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
-import com.github.daniilandco.vehicle_sales_project.controller.response.RegisterResponse;
 import com.github.daniilandco.vehicle_sales_project.security.jwt.JwtTokenProvider;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,8 +27,8 @@ import java.sql.Timestamp;
 @RequestMapping("/auth")
 public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
-    private UserRepository userRepository;
-    private JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public AuthenticationController(AuthenticationManager authenticationManager, UserRepository userRepository, JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
@@ -37,14 +37,15 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) throws JwtAuthenticationException {
+    public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     request.getEmail(), request.getPassword()));
         } catch (AuthenticationException e) {
             return ResponseEntity
                     .badRequest()
-                    .body(e.getMessage());
+                    .body(new RestApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            e.getMessage()));
         }
 
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
@@ -52,7 +53,10 @@ public class AuthenticationController {
         userRepository.save(user);
 
         String token = jwtTokenProvider.createToken(request.getEmail());
-        return ResponseEntity.ok(new LoginResponse(token, request.getEmail()));
+        return ResponseEntity.ok(
+                new RestApiResponse(HttpStatus.OK.value(),
+                        "User is logged in",
+                        new SuccessLoginResponse(token, request.getEmail())));
     }
 
     @PostMapping("/logout")
@@ -66,12 +70,14 @@ public class AuthenticationController {
         if (userRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new RegisterResponse(HttpServletResponse.SC_BAD_REQUEST, "Email already exists"));
+                    .body(new RestApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            "Email already exists"));
         }
         if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new RegisterResponse(HttpServletResponse.SC_BAD_REQUEST, "Phone number already exists"));
+                    .body(new RestApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            "Phone number already exists"));
         }
 
         try {
@@ -79,9 +85,11 @@ public class AuthenticationController {
         } catch (Exception e) {
             return ResponseEntity
                     .badRequest()
-                    .body(new RegisterResponse(HttpServletResponse.SC_BAD_REQUEST, "Registration error"));
+                    .body(new RestApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            "Registration error"));
         }
 
-        return ResponseEntity.ok(new RegisterResponse(HttpServletResponse.SC_CREATED, "User is registered"));
+        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(),
+                "User is registered"));
     }
 }

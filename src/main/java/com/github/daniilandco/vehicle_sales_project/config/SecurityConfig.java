@@ -16,8 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private static int encryptionStrength = 12;
+    private static final int encryptionStrength = 12;
 
     private final JwtConfigurer jwtConfigurer;
 
@@ -33,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
+                .antMatchers("/admin").hasAuthority("manage")
                 .antMatchers("/auth/**").permitAll()
                 .anyRequest()
                 .authenticated()

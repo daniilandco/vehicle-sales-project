@@ -1,18 +1,21 @@
 package com.github.daniilandco.vehicle_sales_project.model.user;
 
+import com.github.daniilandco.vehicle_sales_project.model.ad.Ad;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
 import java.io.Serial;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Set;
 
-@Data // Creates getters and setters for all fields
-@Entity // This tells Hibernate to make a table out of this class
-@Table(name = "Users",
+@Data
+@Entity(name = "User") // Tells Hibernate to make a table out of this class
+@Table(name = "user",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "email", name = "email"),
                 @UniqueConstraint(columnNames = "phone_number", name = "phone_number")
@@ -58,6 +61,9 @@ public class User implements UserDetails {
     @Column(name = "last_login")
     @UpdateTimestamp
     private Timestamp lastLogin;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Ad> ads;
 
     @Serial
     @Transient
