@@ -19,13 +19,14 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/ads")
+    @GetMapping("/ads") //GOVNOKOD
     public Iterable<Ad> getUserAds() {
-        Optional<User> user = userRepository.findByEmail("user");
-        return user.get().getAds();
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        Optional<User> user = userRepository.findByEmail(email);
+        return user.<Iterable<Ad>>map(User::getAds).orElse(null);
     }
 
-    @PostMapping("/create_new_ad")
+    @PostMapping("/add") //GOVNOKOD
     public String addAd(@RequestBody NewAdRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         if (email != null) {
@@ -41,5 +42,4 @@ public class UserController {
             }
         } else return "failed";
     }
-
 }
