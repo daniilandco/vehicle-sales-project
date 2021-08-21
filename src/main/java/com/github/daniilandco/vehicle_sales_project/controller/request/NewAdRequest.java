@@ -14,7 +14,7 @@ public class NewAdRequest {
     private String description;
     private BigDecimal price;
     private Integer makeId;
-    private Date release_year;
+    private Date releaseYear;
 
     @Enumerated(EnumType.STRING)
     private Status status;

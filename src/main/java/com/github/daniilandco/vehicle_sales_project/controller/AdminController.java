@@ -1,13 +1,16 @@
 package com.github.daniilandco.vehicle_sales_project.controller;
 
-import com.github.daniilandco.vehicle_sales_project.model.ad.Ad;
+import com.github.daniilandco.vehicle_sales_project.dto.mapper.AdMapper;
+import com.github.daniilandco.vehicle_sales_project.dto.mapper.UserMapper;
+import com.github.daniilandco.vehicle_sales_project.dto.model.ad.AdDto;
+import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import com.github.daniilandco.vehicle_sales_project.repository.ad.AdRepository;
 import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 @RestController
@@ -21,35 +24,35 @@ public class AdminController {
 
 
     @GetMapping("/users")
-    public Iterable<User> getAllUsers() {
-        return userRepository.findAll();
+    public Iterable<UserDto> getAllUsers() {
+        return UserMapper.toUserDtoSet(userRepository.findAll());
     }
 
     @GetMapping("/ads")
-    public Iterable<Ad> getAllAds() {
-        return adRepository.findAll();
+    public Iterable<AdDto> getAllAds() {
+        return AdMapper.toAdDtoSet(adRepository.findAll());
     }
 
     @GetMapping("/users/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return StreamSupport.stream(userRepository.findAll().spliterator(), false).
+    public UserDto getUserById(@PathVariable Long id) {
+        return UserMapper.toUserDto(Objects.requireNonNull(StreamSupport.stream(userRepository.findAll().spliterator(), false).
                 filter(user -> user.getId().equals(id))
                 .findFirst()
-                .orElse(null);
+                .orElse(null)));
     }
 
     @GetMapping("/ads/{id}")
-    public Ad getAdById(@PathVariable Long id) {
-        return StreamSupport.stream(adRepository.findAll().spliterator(), false).
+    public AdDto getAdById(@PathVariable Long id) {
+        return AdMapper.toAdDto(Objects.requireNonNull(StreamSupport.stream(adRepository.findAll().spliterator(), false).
                 filter(ad -> ad.getId().equals(id))
                 .findFirst()
-                .orElse(null);
+                .orElse(null)));
     }
 
     @PostMapping("/users")
-    public User addUser(@RequestBody User user) {
+    public UserDto addUser(@RequestBody User user) {
         userRepository.save(user);
-        return user;
+        return UserMapper.toUserDto(user);
     }
 
     @DeleteMapping("/users/{id}")

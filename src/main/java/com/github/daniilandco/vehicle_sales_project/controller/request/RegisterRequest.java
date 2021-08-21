@@ -1,9 +1,7 @@
 package com.github.daniilandco.vehicle_sales_project.controller.request;
 
-import com.github.daniilandco.vehicle_sales_project.config.SecurityConfig;
 import com.github.daniilandco.vehicle_sales_project.model.user.Role;
 import com.github.daniilandco.vehicle_sales_project.model.user.Status;
-import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import lombok.Data;
 
 import javax.persistence.EnumType;
@@ -23,12 +21,4 @@ public class RegisterRequest {
     @Enumerated(value = EnumType.STRING)
     private Status status;
 
-    public User getUser() {
-        return new User(
-                this.getFirstName(), this.getSecondName(),
-                this.getEmail(), this.getPhoneNumber(),
-                SecurityConfig.passwordEncoder().encode(this.getPassword()),
-                this.getStatus(), this.getRole()
-        );
-    }
 }
