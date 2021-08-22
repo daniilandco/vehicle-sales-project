@@ -57,7 +57,7 @@ public class JwtTokenProvider {
         return !claimsJws.getBody().getExpiration().before(new Date());
     }
 
-    public Authentication getAuthentication(String token) {
+    public Authentication getAuthentication(String token) { // BIG PROBLEM
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));
         return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), "", userDetails.getAuthorities());
     }

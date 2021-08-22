@@ -8,27 +8,46 @@ import com.github.daniilandco.vehicle_sales_project.model.ad.Ad;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import com.github.daniilandco.vehicle_sales_project.repository.ad.AdRepository;
 import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
-@Component
+@Service
 public class AdServiceImplementation implements AdService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private AdRepository adRepository;
+    private final UserRepository userRepository;
+    private final AdRepository adRepository;
+
+    public AdServiceImplementation(UserRepository userRepository, AdRepository adRepository) {
+        this.userRepository = userRepository;
+        this.adRepository = adRepository;
+    }
+
+    @Override
+    public ResponseEntity<?> getAllAds() {
+        return ResponseEntity
+                .ok(new RestApiResponse(HttpStatus.OK.value(),
+                        "", AdMapper.toAdDtoSet(adRepository.findAll())));
+    }
+
+    @Override
+    public ResponseEntity<?> getAdById(Long id) {
+        AdDto adDto = AdMapper.toAdDto(Objects.requireNonNull(StreamSupport.stream(adRepository.findAll().spliterator(), false).
+                filter(ad -> ad.getId().equals(id))
+                .findFirst()
+                .orElse(null)));
+        return ResponseEntity
+                .ok(new RestApiResponse(HttpStatus.OK.value(),
+                        "", adDto));
+    }
 
     @Override
     public ResponseEntity<?> addAd(NewAdRequest request) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        Optional<User> userFromDb = userRepository.findByEmail(email);
+        Optional<User> userFromDb = getLoggedInUser();
         if (userFromDb.isPresent()) {
             User user = userFromDb.get();
             Ad ad = new Ad(user, request.getTitle(), request.getDescription(), request.getMakeId(), request.getPrice(), request.getReleaseYear(), request.getStatus());
@@ -46,8 +65,7 @@ public class AdServiceImplementation implements AdService {
 
     @Override
     public ResponseEntity<?> getUserAds() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> user = getLoggedInUser();
         Iterable<AdDto> adDtoSet = AdMapper.toAdDtoSet(user.get().getAds()); // handle exception
         return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "Ok", adDtoSet));
     }
@@ -75,7 +93,18 @@ public class AdServiceImplementation implements AdService {
     }
 
     @Override
-    public ResponseEntity<?> getAdById(Long id) {
+    public ResponseEntity<?> deleteUserAdById(Long id) {
+        if (adRepository.existsById(id)) {
+            adRepository.deleteById(id);
+            return ResponseEntity.ok(
+                    new RestApiResponse(HttpStatus.OK.value(), "Ad is deleted"));
+        } else return ResponseEntity
+                .badRequest()
+                .body(new RestApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "error"));
+    }
+
+    @Override
+    public ResponseEntity<?> getUserAdById(Long id) {
         try {
             AdDto adDto = AdMapper.toAdDto(Objects.requireNonNull(StreamSupport.stream(adRepository.findAll().spliterator(), false).
                     filter(user -> user.getId().equals(id))
@@ -87,5 +116,10 @@ public class AdServiceImplementation implements AdService {
                     .badRequest()
                     .body(new RestApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Ad doesn't exist or belong to logged in user"));
         }
+    }
+
+    private Optional<User> getLoggedInUser() { //repeat!!
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        return userRepository.findByEmail(email);
     }
 }

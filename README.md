@@ -89,10 +89,10 @@ Of course, users should have opportunity to search ads which are suitable for th
   - [x] log out
 
 * Editing account parameters
-  - [ ] edit name
-  - [ ] edit phone number
-  - [ ] edit login
-  - [ ] edit password
+  - [x] edit name
+  - [x] edit phone number
+  - [x] edit login
+  - [x] edit password
 
 * Creating own ads
   - [x] create an ad

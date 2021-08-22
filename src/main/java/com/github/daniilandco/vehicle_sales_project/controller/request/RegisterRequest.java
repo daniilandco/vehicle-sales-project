@@ -14,6 +14,8 @@ public class RegisterRequest {
     private String email;
     private String phoneNumber;
     private String password;
+    private String location;
+    private String profilePhoto;
 
     @Enumerated(value = EnumType.STRING)
     private Role role;

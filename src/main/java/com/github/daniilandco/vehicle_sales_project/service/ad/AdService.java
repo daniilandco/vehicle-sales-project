@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
  */
 public interface AdService {
 
+    ResponseEntity<?> getAllAds();
+
     ResponseEntity<?> addAd(NewAdRequest request);
 
     ResponseEntity<?> getUserAds();
@@ -15,4 +17,8 @@ public interface AdService {
     ResponseEntity<?> updateAd(Long id, NewAdRequest updatedAd);
 
     ResponseEntity<?> getAdById(Long id);
+
+    ResponseEntity<?> deleteUserAdById(Long id);
+
+    ResponseEntity<?> getUserAdById(Long id);
 }

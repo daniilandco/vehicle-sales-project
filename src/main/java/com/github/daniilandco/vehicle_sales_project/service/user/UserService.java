@@ -4,6 +4,9 @@ import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequ
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 /**
  * Created by Daniel Bondarkov.
@@ -13,6 +16,12 @@ public interface UserService {
      * Register a new user
      */
     ResponseEntity<?> register(RegisterRequest request);
+
+    ResponseEntity<?> getAllUsers();
+
+    ResponseEntity<?> getUserById(Long id);
+
+    void deleteUserById(Long id);
 
     /**
      * Login a user
@@ -27,7 +36,11 @@ public interface UserService {
     /**
      * Update profile of the user
      */
-    UserDto updateProfile(UserDto userDto);
+    ResponseEntity<?> updateProfile(RegisterRequest request);
+
+    ResponseEntity<?> updateProfilePhoto(MultipartFile imageFile) throws IOException;
+
+    ResponseEntity<?> getProfilePhoto() throws IOException;
 
     /**
      * Update password
