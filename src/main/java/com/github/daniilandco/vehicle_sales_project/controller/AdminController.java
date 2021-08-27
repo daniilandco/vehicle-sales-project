@@ -1,49 +1,62 @@
 package com.github.daniilandco.vehicle_sales_project.controller;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
-import com.github.daniilandco.vehicle_sales_project.service.ad.AdServiceImplementation;
-import com.github.daniilandco.vehicle_sales_project.service.user.UserServiceImplementation;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
+import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
+import com.github.daniilandco.vehicle_sales_project.service.user.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
-    @Autowired
-    private UserServiceImplementation userServiceImplementation;
+    private final UserService userService;
+    private final AdService adService;
 
-    @Autowired
-    private AdServiceImplementation adServiceImplementation;
+    public AdminController(UserService userService, AdService adService) {
+        this.userService = userService;
+        this.adService = adService;
+    }
 
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers() {
-        return userServiceImplementation.getAllUsers();
+        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "ok", userService.getAllUsers()));
     }
 
     @GetMapping("/ads")
     public ResponseEntity<?> getAllAds() {
-        return adServiceImplementation.getAllAds();
+        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "ok", adService.getAllAds()));
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        return userServiceImplementation.getUserById(id);
+        return ResponseEntity
+                .ok(new RestApiResponse(HttpStatus.OK.value(),
+                        "ok", userService.getUserById(id)));
     }
 
     @GetMapping("/ads/{id}")
     public ResponseEntity<?> getAdById(@PathVariable Long id) {
-        return adServiceImplementation.getAdById(id);
+        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "ok", adService.getAdById(id)));
     }
 
     @PostMapping("/users")
     public ResponseEntity<?> addUser(@RequestBody RegisterRequest request) {
-        return userServiceImplementation.register(request);
+        try {
+            userService.register(request);
+        } catch (JwtAuthenticationException e) {
+            ResponseEntity
+                    .badRequest()
+                    .body(new RestApiResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+        }
+        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "user is registered"));
     }
 
     @DeleteMapping("/users/{id}")
     public void deleteUserById(@PathVariable Long id) {
-        userServiceImplementation.deleteUserById(id);
+        userService.deleteUserById(id);
     }
 }

@@ -1,24 +1,32 @@
 package com.github.daniilandco.vehicle_sales_project.service.ad;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequest;
-import org.springframework.http.ResponseEntity;
+import com.github.daniilandco.vehicle_sales_project.dto.model.ad.AdDto;
+import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.net.URL;
 
 /**
  * Created by Daniel Bondarkov.
  */
 public interface AdService {
 
-    ResponseEntity<?> getAllAds();
+    Iterable<AdDto> getAllAds();
 
-    ResponseEntity<?> addAd(NewAdRequest request);
+    AdDto newAd(NewAdRequest request) throws JwtAuthenticationException;
 
-    ResponseEntity<?> getUserAds();
+    Iterable<AdDto> getUserAds() throws JwtAuthenticationException;
 
-    ResponseEntity<?> updateAd(Long id, NewAdRequest updatedAd);
+    void updateAd(Long id, NewAdRequest updatedAd) throws Exception;
 
-    ResponseEntity<?> getAdById(Long id);
+    AdDto getAdById(Long id);
 
-    ResponseEntity<?> deleteUserAdById(Long id);
+    void deleteUserAdById(Long id) throws Exception;
 
-    ResponseEntity<?> getUserAdById(Long id);
+    AdDto getUserAdById(Long id);
+
+    void uploadAdPhotos(Long id, MultipartFile[] images) throws Exception;
+
+    URL getAdPhotoById(Long adId, int photoId) throws Exception;
 }

@@ -30,4 +30,11 @@ constraint FK_author_ad FOREIGN KEY (author_id)  REFERENCES user (id)
 )
 engine=InnoDB;
 
-
+create TABLE `ad_photo` (
+	`id` bigint NOT NULL AUTO_INCREMENT,
+	`ad_id` bigint NOT NULL,
+	`photo` VARCHAR(255),
+	PRIMARY KEY (`id`),
+	CONSTRAINT `FK_photos_ad` FOREIGN KEY (`ad_id`) REFERENCES ad (id)
+)
+ENGINE=InnoDB;

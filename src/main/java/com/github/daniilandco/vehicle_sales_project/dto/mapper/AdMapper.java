@@ -10,15 +10,15 @@ import java.util.Set;
 @Component
 public class AdMapper {
 
-    public static Iterable<AdDto> toAdDtoSet(Iterable<Ad> adSet) {
+    public Iterable<AdDto> toAdDtoSet(Iterable<Ad> adSet) {
         Set<AdDto> adDtoSet = new HashSet<>();
         for (Ad ad : adSet) {
-            adDtoSet.add(AdMapper.toAdDto(ad));
+            adDtoSet.add(toAdDto(ad));
         }
         return adDtoSet;
     }
 
-    public static AdDto toAdDto(Ad ad) {
+    public AdDto toAdDto(Ad ad) {
         return new AdDto()
                 .setId(ad.getId())
                 //.setOwner(UserMapper.toUserDto(ad.getAuthor()))

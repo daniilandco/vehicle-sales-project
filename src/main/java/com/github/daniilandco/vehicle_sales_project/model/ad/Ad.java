@@ -1,5 +1,6 @@
 package com.github.daniilandco.vehicle_sales_project.model.ad;
 
+import com.github.daniilandco.vehicle_sales_project.model.photos.AdPhoto;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -51,6 +53,9 @@ public class Ad {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @OneToMany(mappedBy = "ad", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<AdPhoto> photos;
 
     public Ad() {
     }

@@ -97,10 +97,10 @@ Of course, users should have opportunity to search ads which are suitable for th
 * Creating own ads
   - [x] create an ad
   - [x] watch list of all ads
-  - [ ] maintain an ad
+  - [x] maintain an ad
 
 * Ad maintaining
-  - [ ] attach photos of a vehicle
+  - [x] attach photos of a vehicle
   - [x] edit description of an ad
   - [x] edit cost of a vehicle
   - [x] edit title of an ad

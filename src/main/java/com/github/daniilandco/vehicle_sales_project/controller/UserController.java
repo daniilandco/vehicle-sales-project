@@ -1,9 +1,10 @@
 package com.github.daniilandco.vehicle_sales_project.controller;
 
-import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
-import com.github.daniilandco.vehicle_sales_project.service.ad.AdServiceImplementation;
-import com.github.daniilandco.vehicle_sales_project.service.user.UserServiceImplementation;
+import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
+import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.service.user.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,61 +15,47 @@ import java.io.IOException;
 @RequestMapping("/user")
 public class UserController {
 
-    private final AdServiceImplementation adServiceImplementation;
-    private final UserServiceImplementation userServiceImplementation;
+    private final UserService userService;
 
-    public UserController(AdServiceImplementation adServiceImplementation, UserServiceImplementation userServiceImplementation) {
-        this.adServiceImplementation = adServiceImplementation;
-        this.userServiceImplementation = userServiceImplementation;
-    }
-
-    @GetMapping("/ads")
-    public ResponseEntity<?> getUserAds() {
-        return adServiceImplementation.getUserAds();
-    }
-
-    @GetMapping("/ads/{id}")
-    public ResponseEntity<?> getAdById(@PathVariable Long id) {
-        return adServiceImplementation.getUserAdById(id);
-    }
-
-    @PostMapping("/add")
-    public ResponseEntity<?> addAd(@RequestBody NewAdRequest request) {
-        return adServiceImplementation.addAd(request);
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PutMapping("/update")
     public ResponseEntity<?> updateProfile(@RequestBody RegisterRequest request) {
-        return userServiceImplementation.updateProfile(request);
+        try {
+            userService.updateProfile(request);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new RestApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            "update profile error"));
+        }
+        return ResponseEntity
+                .ok(new RestApiResponse(HttpStatus.OK.value(),
+                        "profile is updated"));
     }
 
     @PostMapping("/profile_photo")
     public ResponseEntity<?> updateProfilePhoto(@RequestParam("file") MultipartFile imageFile) {
         try {
-            return userServiceImplementation.updateProfilePhoto(imageFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            userService.updateProfilePhoto(imageFile);
+        } catch (IOException | JwtAuthenticationException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body((new RestApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Update profile photo error")));
         }
+        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "profile photo is updated"));
     }
 
     @GetMapping("/profile_photo")
     public ResponseEntity<?> getProfilePhoto() {
         try {
-            return userServiceImplementation.getProfilePhoto();
-        } catch (IOException e) {
+            return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "", userService.getProfilePhoto()));
+        } catch (IOException | JwtAuthenticationException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    @PutMapping("/ads/{id}/update")
-    public ResponseEntity<?> updateAd(@PathVariable Long id, @RequestBody NewAdRequest request) {
-        return adServiceImplementation.updateAd(id, request);
-    }
-
-    @DeleteMapping("/ads/{id}/delete")
-    public ResponseEntity<?> deleteAdById(@PathVariable Long id) {
-        return adServiceImplementation.deleteUserAdById(id);
-    }
 }

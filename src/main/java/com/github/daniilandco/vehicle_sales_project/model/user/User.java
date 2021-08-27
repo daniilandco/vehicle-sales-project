@@ -24,6 +24,7 @@ import java.util.Set;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "BIGINT")
     private Long id;
 
     @Column(name = "email")
@@ -79,19 +80,19 @@ public class User implements UserDetails {
         this.secondName = secondName;
     }
 
-    public boolean isActive() {
-        return status.equals(Status.ACTIVE);
-    }
-
     public UserDetails getUserDetails() {
         return new org.springframework.security.core.userdetails.User(
-                this.getEmail(), this.getPassword(),
+                this.getId().toString(), this.getPassword(),
                 this.isActive(),
                 this.isActive(),
                 this.isActive(),
                 this.isActive(),
                 this.getRole().getAuthorities()
         );
+    }
+
+    public boolean isActive() {
+        return status.equals(Status.ACTIVE);
     }
 
     @Override
@@ -106,7 +107,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return getEmail();
+        return getId().toString();
     }
 
     @Override
