@@ -14,7 +14,7 @@ public interface AdService {
 
     Iterable<AdDto> getAllAds();
 
-    AdDto newAd(NewAdRequest request) throws JwtAuthenticationException;
+    AdDto newAd(NewAdRequest request) throws Exception;
 
     Iterable<AdDto> getUserAds() throws JwtAuthenticationException;
 

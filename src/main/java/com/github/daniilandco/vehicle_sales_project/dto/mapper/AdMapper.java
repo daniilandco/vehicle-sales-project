@@ -25,7 +25,7 @@ public class AdMapper {
                 .setTitle(ad.getTitle())
                 .setDescription(ad.getDescription())
                 .setPrice(ad.getPrice())
-                .setMakeId(ad.getMakeId())
+                .setCategory(ad.getCategory())
                 .setCreatedAt(ad.getCreatedAt())
                 .setReleaseYear(ad.getReleaseYear())
                 .setStatus(ad.getStatus());

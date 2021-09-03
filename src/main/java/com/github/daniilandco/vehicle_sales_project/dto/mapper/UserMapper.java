@@ -2,7 +2,6 @@ package com.github.daniilandco.vehicle_sales_project.dto.mapper;
 
 import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -11,8 +10,11 @@ import java.util.HashSet;
 @Component
 public class UserMapper {
 
-    @Autowired
-    private AdMapper adMapper;
+    private final AdMapper adMapper;
+
+    public UserMapper(AdMapper adMapper) {
+        this.adMapper = adMapper;
+    }
 
     public Iterable<UserDto> toUserDtoSet(Iterable<User> userSet) {
         Collection<UserDto> userDtoSet = new HashSet<>();

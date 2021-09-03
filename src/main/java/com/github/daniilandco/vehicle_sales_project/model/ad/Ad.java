@@ -1,5 +1,6 @@
 package com.github.daniilandco.vehicle_sales_project.model.ad;
 
+import com.github.daniilandco.vehicle_sales_project.model.category.Category;
 import com.github.daniilandco.vehicle_sales_project.model.photos.AdPhoto;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import lombok.Getter;
@@ -37,8 +38,14 @@ public class Ad {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "make_id")
-    private Integer makeId;
+    @ManyToOne(cascade = {
+            CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.PERSIST,
+            CascadeType.REFRESH
+    })
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Column(name = "price")
     private BigDecimal price;
@@ -60,11 +67,11 @@ public class Ad {
     public Ad() {
     }
 
-    public Ad(User author, String title, String description, Integer makeId, BigDecimal price, Date releaseYear, Status status) {
+    public Ad(User author, String title, String description, Category category, BigDecimal price, Date releaseYear, Status status) throws Exception {
         this.author = author;
         this.title = title;
         this.description = description;
-        this.makeId = makeId;
+        this.category = category;
         this.price = price;
         this.releaseYear = releaseYear;
         this.status = status;

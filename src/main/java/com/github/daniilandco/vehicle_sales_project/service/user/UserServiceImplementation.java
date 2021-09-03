@@ -78,9 +78,9 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public String login(LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("user doesn't exists"));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getId().toString(), request.getPassword()));
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
         user.setLastLogin(new Timestamp(System.currentTimeMillis()));
         userRepository.save(user);
 

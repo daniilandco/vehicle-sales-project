@@ -39,7 +39,7 @@ public class AdController {
     public ResponseEntity<?> newAd(@RequestBody NewAdRequest request) {
         try {
             return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "ok", adService.newAd(request)));
-        } catch (JwtAuthenticationException e) {
+        } catch (Exception e) {
             return ResponseEntity
                     .badRequest()
                     .body(new RestApiResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));

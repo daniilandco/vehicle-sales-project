@@ -5,7 +5,6 @@ import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterR
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
 import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
 import com.github.daniilandco.vehicle_sales_project.service.user.UserServiceImplementation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -20,8 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
-    @Autowired
-    private UserServiceImplementation userService;
+    private final UserServiceImplementation userService;
+
+    public AuthenticationController(UserServiceImplementation userService) {
+        this.userService = userService;
+    }
 
 
     @PostMapping("/login")

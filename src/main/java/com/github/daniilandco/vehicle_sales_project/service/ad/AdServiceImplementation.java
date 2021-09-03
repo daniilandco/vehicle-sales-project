@@ -10,6 +10,7 @@ import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import com.github.daniilandco.vehicle_sales_project.repository.ad.AdRepository;
 import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
 import com.github.daniilandco.vehicle_sales_project.security.AuthContextHandler;
+import com.github.daniilandco.vehicle_sales_project.service.category.CategoryService;
 import com.github.daniilandco.vehicle_sales_project.service.gcs.GenerateV4GetObjectSignedUrl;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -30,6 +32,7 @@ public class AdServiceImplementation implements AdService {
     private final AdMapper adMapper;
     private final GenerateV4GetObjectSignedUrl generateV4GetObjectSignedUrl;
     private final AuthContextHandler authContextHandler;
+    private final CategoryService categoryService;
 
     @Value("${cloud.bucketname}")
     private String bucketName;
@@ -38,13 +41,14 @@ public class AdServiceImplementation implements AdService {
     @Value("${cloud.subdirectory.ad}")
     private String adPhotosPath;
 
-    public AdServiceImplementation(UserRepository userRepository, AdRepository adRepository, Storage storage, AdMapper adMapper, GenerateV4GetObjectSignedUrl generateV4GetObjectSignedUrl, AuthContextHandler authContextHandler) {
+    public AdServiceImplementation(UserRepository userRepository, AdRepository adRepository, Storage storage, AdMapper adMapper, GenerateV4GetObjectSignedUrl generateV4GetObjectSignedUrl, AuthContextHandler authContextHandler, CategoryService categoryService) {
         this.userRepository = userRepository;
         this.adRepository = adRepository;
         this.storage = storage;
         this.adMapper = adMapper;
         this.generateV4GetObjectSignedUrl = generateV4GetObjectSignedUrl;
         this.authContextHandler = authContextHandler;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -62,9 +66,9 @@ public class AdServiceImplementation implements AdService {
     }
 
     @Override
-    public AdDto newAd(NewAdRequest request) throws JwtAuthenticationException {
+    public AdDto newAd(NewAdRequest request) throws Exception {
         User userModel = authContextHandler.getLoggedInUser();
-        Ad ad = new Ad(userModel, request.getTitle(), request.getDescription(), request.getMakeId(), request.getPrice(), request.getReleaseYear(), request.getStatus());
+        Ad ad = new Ad(userModel, request.getTitle(), request.getDescription(), categoryService.getCategory(request.getCategoryRequest()), request.getPrice(), request.getReleaseYear(), request.getStatus());
         userModel.getAds().add(ad);
         userRepository.save(userModel);
         return adMapper.toAdDto(ad);
@@ -81,8 +85,8 @@ public class AdServiceImplementation implements AdService {
     public void updateAd(Long id, NewAdRequest updatedAd) throws Exception {
         User user = authContextHandler.getLoggedInUser();
         Ad ad = user.getAds().stream().filter(adModel -> adModel.getId().equals(id)).findFirst().orElseThrow(() -> new Exception("ad doesn't exist or belong to logged in user"));
-        if (updatedAd.getMakeId() != null) {
-            ad.setMakeId(updatedAd.getMakeId());
+        if (updatedAd.getCategoryRequest() != null) {
+            ad.setCategory(categoryService.getCategory(updatedAd.getCategoryRequest()));
         }
         if (updatedAd.getTitle() != null) {
             ad.setTitle(updatedAd.getTitle());
@@ -101,12 +105,21 @@ public class AdServiceImplementation implements AdService {
     @Override
     public void deleteUserAdById(Long id) throws Exception {
         User user = authContextHandler.getLoggedInUser();
-        if (adRepository.existsById(id) && user.getAds().contains(adRepository.findById(id).get())) {
-            user.getAds().remove(user.getAds().stream().filter(ad -> ad.getId().equals(id)).findFirst().orElseThrow(() -> new Exception("error")));
+        if (adRepository.existsById(id) && user.getAds().contains(getAdModelById(id))) {
+            user.getAds().remove(user.getAds().stream().filter(ad -> ad.getId().equals(id)).findFirst().orElseThrow(() -> new Exception("ad belong to logged in user")));
             userRepository.save(user);
             adRepository.deleteById(id);
         } else {
-            throw new Exception("error");
+            throw new Exception("ad doesn't exist or belong to logged in user");
+        }
+    }
+
+    private Ad getAdModelById(Long id) throws Exception {
+        Optional<Ad> ad = adRepository.findById(id);
+        if (ad.isPresent()) {
+            return ad.get();
+        } else {
+            throw new Exception("no such ad with id:" + id);
         }
     }
 
