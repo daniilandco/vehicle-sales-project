@@ -2,10 +2,8 @@ package com.github.daniilandco.vehicle_sales_project.controller;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
-import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
 import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
 import com.github.daniilandco.vehicle_sales_project.service.user.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,36 +21,35 @@ public class AdminController {
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers() {
-        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "ok", userService.getAllUsers()));
+        return ResponseEntity.ok(new RestApiResponse("ok", userService.getAllUsers()));
     }
 
     @GetMapping("/ads")
     public ResponseEntity<?> getAllAds() {
-        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "ok", adService.getAllAds()));
+        return ResponseEntity.ok(new RestApiResponse("ok", adService.getAllAds()));
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         return ResponseEntity
-                .ok(new RestApiResponse(HttpStatus.OK.value(),
-                        "ok", userService.getUserById(id)));
+                .ok(new RestApiResponse("ok", userService.getUserById(id)));
     }
 
     @GetMapping("/ads/{id}")
     public ResponseEntity<?> getAdById(@PathVariable Long id) {
-        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "ok", adService.getAdById(id)));
+        return ResponseEntity.ok(new RestApiResponse("ok", adService.getAdById(id)));
     }
 
     @PostMapping("/users")
     public ResponseEntity<?> addUser(@RequestBody RegisterRequest request) {
         try {
             userService.register(request);
-        } catch (JwtAuthenticationException e) {
-            ResponseEntity
+            return ResponseEntity.ok(new RestApiResponse("user is registered"));
+        } catch (Exception e) {
+            return ResponseEntity
                     .badRequest()
-                    .body(new RestApiResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+                    .body(new RestApiResponse(e.getMessage()));
         }
-        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "user is registered"));
     }
 
     @DeleteMapping("/users/{id}")

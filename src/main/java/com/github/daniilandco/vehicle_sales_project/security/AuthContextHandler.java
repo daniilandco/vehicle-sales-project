@@ -1,6 +1,6 @@
 package com.github.daniilandco.vehicle_sales_project.security;
 
-import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,11 +16,11 @@ public class AuthContextHandler {
         this.userRepository = userRepository;
     }
 
-    public User getLoggedInUser() throws JwtAuthenticationException {
+    public User getLoggedInUser() throws UserIsNotLoggedInException {
         String id = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         Optional<User> user = userRepository.findById(Long.parseLong(id));
         if (user.isEmpty()) {
-            throw new JwtAuthenticationException("user is not logged in");
+            throw new UserIsNotLoggedInException();
         } else {
             return user.get();
         }

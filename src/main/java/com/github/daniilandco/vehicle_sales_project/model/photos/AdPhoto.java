@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity(name = "AdPhoto") // This tells Hibernate to make a table out of this class
-@Table(name = "ad_photo")
+@Table(name = "AdPhoto")
 public class AdPhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

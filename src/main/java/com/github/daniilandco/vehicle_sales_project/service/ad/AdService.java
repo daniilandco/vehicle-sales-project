@@ -2,8 +2,7 @@ package com.github.daniilandco.vehicle_sales_project.service.ad;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.model.ad.AdDto;
-import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
-import org.springframework.web.multipart.MultipartFile;
+import com.github.daniilandco.vehicle_sales_project.exception.*;
 
 import java.net.URL;
 
@@ -14,19 +13,19 @@ public interface AdService {
 
     Iterable<AdDto> getAllAds();
 
-    AdDto newAd(NewAdRequest request) throws Exception;
+    AdDto newAd(NewAdRequest request) throws UserIsNotLoggedInException, CategoryException;
 
-    Iterable<AdDto> getUserAds() throws JwtAuthenticationException;
+    Iterable<AdDto> getUserAds() throws JwtAuthenticationException, UserIsNotLoggedInException;
 
-    void updateAd(Long id, NewAdRequest updatedAd) throws Exception;
+    void updateAd(Long id, NewAdRequest updatedAd) throws UserIsNotLoggedInException, CategoryException, AdNotFoundException;
 
     AdDto getAdById(Long id);
 
     void deleteUserAdById(Long id) throws Exception;
 
-    AdDto getUserAdById(Long id);
+    AdDto getUserAdById(Long id) throws AdDoesNotBelongToLoggedInUserException, AdNotFoundException;
 
-    void uploadAdPhotos(Long id, MultipartFile[] images) throws Exception;
+    void uploadAdPhotos(Long id, byte[][] images) throws Exception;
 
     URL getAdPhotoById(Long adId, int photoId) throws Exception;
 }

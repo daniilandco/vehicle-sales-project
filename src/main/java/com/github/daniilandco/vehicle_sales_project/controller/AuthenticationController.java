@@ -3,9 +3,9 @@ package com.github.daniilandco.vehicle_sales_project.controller;
 import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
-import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.exception.EmailAlreadyExistsException;
+import com.github.daniilandco.vehicle_sales_project.exception.PhoneNumberAlreadyExistsException;
 import com.github.daniilandco.vehicle_sales_project.service.user.UserServiceImplementation;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +29,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         String token = userService.login(request);
-        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "user is logged in", token));
+        return ResponseEntity.ok(new RestApiResponse("user is logged in", token));
     }
 
     @PostMapping("/logout")
@@ -42,11 +42,11 @@ public class AuthenticationController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
             userService.register(request);
-        } catch (JwtAuthenticationException e) {
-            ResponseEntity
+            return ResponseEntity.ok(new RestApiResponse("user is registered"));
+        } catch (EmailAlreadyExistsException | PhoneNumberAlreadyExistsException e) {
+            return ResponseEntity
                     .badRequest()
-                    .body(new RestApiResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+                    .body(new RestApiResponse(e.getMessage()));
         }
-        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "user is registered"));
     }
 }

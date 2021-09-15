@@ -3,8 +3,10 @@ package com.github.daniilandco.vehicle_sales_project.service.user;
 import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
+import com.github.daniilandco.vehicle_sales_project.exception.EmailAlreadyExistsException;
 import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
-import org.springframework.web.multipart.MultipartFile;
+import com.github.daniilandco.vehicle_sales_project.exception.PhoneNumberAlreadyExistsException;
+import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -16,7 +18,7 @@ public interface UserService {
     /**
      * Register a new user
      */
-    void register(RegisterRequest request) throws JwtAuthenticationException;
+    void register(RegisterRequest request) throws JwtAuthenticationException, EmailAlreadyExistsException, PhoneNumberAlreadyExistsException;
 
     Iterable<UserDto> getAllUsers();
 
@@ -32,12 +34,12 @@ public interface UserService {
     /**
      * Update profile of the user
      */
-    void updateProfile(RegisterRequest request) throws Exception;
+    void updateProfile(RegisterRequest request) throws UserIsNotLoggedInException;
 
-    void updateProfilePhoto(MultipartFile imageFile) throws IOException, JwtAuthenticationException;
+    void updateProfilePhoto(byte[] bytes) throws IOException, JwtAuthenticationException, UserIsNotLoggedInException;
 
-    void deleteProfilePhoto() throws JwtAuthenticationException;
+    void deleteProfilePhoto() throws JwtAuthenticationException, UserIsNotLoggedInException;
 
-    URL getProfilePhoto() throws IOException, JwtAuthenticationException;
+    URL getProfilePhoto() throws IOException, JwtAuthenticationException, UserIsNotLoggedInException;
 
 }

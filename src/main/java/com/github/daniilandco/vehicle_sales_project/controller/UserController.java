@@ -3,8 +3,8 @@ package com.github.daniilandco.vehicle_sales_project.controller;
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
 import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
 import com.github.daniilandco.vehicle_sales_project.service.user.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,36 +25,35 @@ public class UserController {
     public ResponseEntity<?> updateProfile(@RequestBody RegisterRequest request) {
         try {
             userService.updateProfile(request);
+            return ResponseEntity
+                    .ok(new RestApiResponse("profile is updated"));
         } catch (Exception e) {
             return ResponseEntity
                     .badRequest()
-                    .body(new RestApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                            "update profile error"));
+                    .body(new RestApiResponse("update profile error"));
         }
-        return ResponseEntity
-                .ok(new RestApiResponse(HttpStatus.OK.value(),
-                        "profile is updated"));
     }
 
     @PostMapping("/profile_photo")
     public ResponseEntity<?> updateProfilePhoto(@RequestParam("file") MultipartFile imageFile) {
         try {
-            userService.updateProfilePhoto(imageFile);
-        } catch (IOException | JwtAuthenticationException e) {
+            userService.updateProfilePhoto(imageFile.getBytes());
+            return ResponseEntity.ok(new RestApiResponse("profile photo is updated"));
+        } catch (IOException | JwtAuthenticationException | UserIsNotLoggedInException e) {
             return ResponseEntity
                     .badRequest()
-                    .body((new RestApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Update profile photo error")));
+                    .body((new RestApiResponse("Update profile photo error")));
         }
-        return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "profile photo is updated"));
     }
 
     @GetMapping("/profile_photo")
     public ResponseEntity<?> getProfilePhoto() {
         try {
-            return ResponseEntity.ok(new RestApiResponse(HttpStatus.OK.value(), "", userService.getProfilePhoto()));
-        } catch (IOException | JwtAuthenticationException e) {
-            e.printStackTrace();
-            return null;
+            return ResponseEntity.ok(new RestApiResponse("ok", userService.getProfilePhoto()));
+        } catch (IOException | JwtAuthenticationException | UserIsNotLoggedInException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body((new RestApiResponse(e.getMessage())));
         }
     }
 

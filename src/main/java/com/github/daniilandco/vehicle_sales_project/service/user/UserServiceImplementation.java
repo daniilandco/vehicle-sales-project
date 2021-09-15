@@ -4,12 +4,15 @@ import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequ
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.mapper.UserMapper;
 import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
-import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.exception.EmailAlreadyExistsException;
+import com.github.daniilandco.vehicle_sales_project.exception.PhoneNumberAlreadyExistsException;
+import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
 import com.github.daniilandco.vehicle_sales_project.security.AuthContextHandler;
 import com.github.daniilandco.vehicle_sales_project.security.jwt.JwtTokenProvider;
-import com.github.daniilandco.vehicle_sales_project.service.gcs.GenerateV4GetObjectSignedUrl;
+import com.github.daniilandco.vehicle_sales_project.service.gcs.GoogleStorageSignedUrlGenerator;
+import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
@@ -19,7 +22,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URL;
@@ -35,26 +37,28 @@ public class UserServiceImplementation implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final Storage storage;
     private final UserMapper userMapper;
-    private final GenerateV4GetObjectSignedUrl generateV4GetObjectSignedUrl;
+    private final GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator;
     private final AuthContextHandler authContextHandler;
+    private final ImageService imageService;
 
     @Value("${cloud.bucketname}")
     private String bucketName;
-    @Value("${cloud.default.photo.extension}")
-    private String defaultExtension;
+    @Value("${cloud.default.photo.format}")
+    private String defaultFormat;
     @Value("${cloud.subdirectory.profile}")
     private String profilePhotosPath;
 
 
-    public UserServiceImplementation(PasswordEncoder passwordEncoder, UserRepository userRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, Storage storage, UserMapper userMapper, GenerateV4GetObjectSignedUrl generateV4GetObjectSignedUrl, AuthContextHandler authContextHandler) {
+    public UserServiceImplementation(PasswordEncoder passwordEncoder, UserRepository userRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, Storage storage, UserMapper userMapper, GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator, AuthContextHandler authContextHandler, ImageService imageService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.storage = storage;
         this.userMapper = userMapper;
-        this.generateV4GetObjectSignedUrl = generateV4GetObjectSignedUrl;
+        this.googleStorageSignedUrlGenerator = googleStorageSignedUrlGenerator;
         this.authContextHandler = authContextHandler;
+        this.imageService = imageService;
     }
 
     @Override
@@ -89,12 +93,12 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void register(RegisterRequest request) throws JwtAuthenticationException {
+    public void register(RegisterRequest request) throws EmailAlreadyExistsException, PhoneNumberAlreadyExistsException {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new JwtAuthenticationException("email already exists");
+            throw new EmailAlreadyExistsException();
         }
         if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-            throw new JwtAuthenticationException("phone number already exists");
+            throw new PhoneNumberAlreadyExistsException();
         }
 
         userRepository.save(getUserFromRegisterRequest(request));
@@ -110,7 +114,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void updateProfile(RegisterRequest request) throws Exception {
+    public void updateProfile(RegisterRequest request) throws UserIsNotLoggedInException {
         User userModel = authContextHandler.getLoggedInUser();
 
         if (request.getFirstName() != null) {
@@ -139,7 +143,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void updateProfilePhoto(MultipartFile imageFile) throws IOException, JwtAuthenticationException {
+    public void updateProfilePhoto(byte[] bytes) throws IOException, UserIsNotLoggedInException {
         User userModel = authContextHandler.getLoggedInUser();
 
         if (userModel.getProfilePhoto() != null) {
@@ -148,15 +152,14 @@ public class UserServiceImplementation implements UserService {
 
         BlobId blobId = BlobId.of(bucketName, getUniqueProfilePhotoPath(userModel));
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-        byte[] bytes = imageFile.getBytes();
-        storage.create(blobInfo, bytes);
+        storage.create(blobInfo, imageService.scaleImage(bytes));
 
         userModel.setProfilePhoto(getUniqueProfilePhotoPath(userModel));
         userRepository.save(userModel);
     }
 
     @Override
-    public void deleteProfilePhoto() throws JwtAuthenticationException {
+    public void deleteProfilePhoto() throws UserIsNotLoggedInException {
         User userModel = authContextHandler.getLoggedInUser();
         if (userModel.getProfilePhoto() != null) {
             storage.delete(BlobId.of(bucketName, userModel.getProfilePhoto()));
@@ -166,12 +169,12 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public URL getProfilePhoto() throws JwtAuthenticationException {
+    public URL getProfilePhoto() throws UserIsNotLoggedInException {
         User userModel = authContextHandler.getLoggedInUser();
-        return generateV4GetObjectSignedUrl.generate(bucketName, getUniqueProfilePhotoPath(userModel));
+        return googleStorageSignedUrlGenerator.generate(bucketName, getUniqueProfilePhotoPath(userModel));
     }
 
     private String getUniqueProfilePhotoPath(User user) {
-        return profilePhotosPath + user.getId() + defaultExtension;
+        return profilePhotosPath + user.getId() + "." + defaultFormat;
     }
 }

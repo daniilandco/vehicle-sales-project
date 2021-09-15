@@ -16,7 +16,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity(name = "User") // Tells Hibernate to make a table out of this class
-@Table(name = "user",
+@Table(name = "User",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "email", name = "email"),
                 @UniqueConstraint(columnNames = "phone_number", name = "phone_number")

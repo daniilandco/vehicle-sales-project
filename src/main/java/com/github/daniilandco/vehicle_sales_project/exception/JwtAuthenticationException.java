@@ -3,10 +3,8 @@ package com.github.daniilandco.vehicle_sales_project.exception;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import javax.naming.AuthenticationException;
-
 @Getter
-public class JwtAuthenticationException extends AuthenticationException {
+public class JwtAuthenticationException extends javax.naming.AuthenticationException {
     private HttpStatus httpStatus;
 
     public JwtAuthenticationException(String msg) {

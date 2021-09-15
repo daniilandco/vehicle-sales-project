@@ -16,7 +16,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity(name = "Ad") // This tells Hibernate to make a table out of this class
-@Table(name = "ad")
+@Table(name = "Ad")
 public class Ad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,7 +67,7 @@ public class Ad {
     public Ad() {
     }
 
-    public Ad(User author, String title, String description, Category category, BigDecimal price, Date releaseYear, Status status) throws Exception {
+    public Ad(User author, String title, String description, Category category, BigDecimal price, Date releaseYear, Status status) {
         this.author = author;
         this.title = title;
         this.description = description;

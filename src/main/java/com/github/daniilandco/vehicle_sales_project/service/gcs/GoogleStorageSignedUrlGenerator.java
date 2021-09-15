@@ -10,10 +10,10 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class GenerateV4GetObjectSignedUrl {
+public class GoogleStorageSignedUrlGenerator {
     private final Storage storage;
 
-    public GenerateV4GetObjectSignedUrl(Storage storage) {
+    public GoogleStorageSignedUrlGenerator(Storage storage) {
         this.storage = storage;
     }
 
@@ -26,7 +26,7 @@ public class GenerateV4GetObjectSignedUrl {
         BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, objectName)).build();
 
         URL url =
-                storage.signUrl(blobInfo, 15, TimeUnit.MINUTES, Storage.SignUrlOption.withV4Signature());
+                storage.signUrl(blobInfo, 24, TimeUnit.HOURS, Storage.SignUrlOption.withV4Signature());
 
         return url;
     }

@@ -5,18 +5,15 @@ import lombok.Data;
 @Data
 public class RestApiResponse {
 
-    private int status;
     private String message;
     private Object body;
 
-    public RestApiResponse(int status, String message, Object body) {
-        this.status = status;
+    public RestApiResponse(String message, Object body) {
         this.message = message;
         this.body = body;
     }
 
-    public RestApiResponse(int status, String message) {
-        this.status = status;
+    public RestApiResponse(String message) {
         this.message = message;
     }
 }

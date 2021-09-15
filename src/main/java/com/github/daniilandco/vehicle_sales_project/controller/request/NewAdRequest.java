@@ -13,7 +13,7 @@ public class NewAdRequest {
     private String title;
     private String description;
     private BigDecimal price;
-    private CategoryRequest categoryRequest;
+    private String[] categoriesHierarchy;
     private Date releaseYear;
 
     @Enumerated(EnumType.STRING)
