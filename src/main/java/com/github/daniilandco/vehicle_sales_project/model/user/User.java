@@ -1,18 +1,22 @@
 package com.github.daniilandco.vehicle_sales_project.model.user;
 
-import lombok.Data;
+import com.github.daniilandco.vehicle_sales_project.model.ad.Ad;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
-import java.io.Serial;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Set;
 
-@Data // Creates getters and setters for all fields
-@Entity // This tells Hibernate to make a table out of this class
-@Table(name = "Users",
+@Getter
+@Setter
+@Entity(name = "User") // Tells Hibernate to make a table out of this class
+@Table(name = "User",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "email", name = "email"),
                 @UniqueConstraint(columnNames = "phone_number", name = "phone_number")
@@ -20,6 +24,7 @@ import java.util.Collection;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "BIGINT")
     private Long id;
 
     @Column(name = "email")
@@ -59,9 +64,8 @@ public class User implements UserDetails {
     @UpdateTimestamp
     private Timestamp lastLogin;
 
-    @Serial
-    @Transient
-    private static final long serialVersionUID = 1L;
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Ad> ads;
 
     public User() {
     }
@@ -76,19 +80,19 @@ public class User implements UserDetails {
         this.secondName = secondName;
     }
 
-    public boolean isActive() {
-        return status.equals(Status.ACTIVE);
-    }
-
     public UserDetails getUserDetails() {
         return new org.springframework.security.core.userdetails.User(
-                this.getEmail(), this.getPassword(),
+                this.getId().toString(), this.getPassword(),
                 this.isActive(),
                 this.isActive(),
                 this.isActive(),
                 this.isActive(),
                 this.getRole().getAuthorities()
         );
+    }
+
+    public boolean isActive() {
+        return status.equals(Status.ACTIVE);
     }
 
     @Override
@@ -103,7 +107,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return getEmail();
+        return getId().toString();
     }
 
     @Override
@@ -125,4 +129,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return isActive();
     }
+
 }

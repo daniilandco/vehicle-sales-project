@@ -85,30 +85,30 @@ Of course, users should have opportunity to search ads which are suitable for th
 ***3. Registered users can do (additionally)***
 
 * Authorization
-    - [x] sign in
-    - [x] log out
+  - [x] sign in
+  - [x] log out
 
 * Editing account parameters
-    - [ ] edit name
-    - [ ] edit phone number
-    - [ ] edit login
-    - [ ] edit password
-    
+  - [x] edit name
+  - [x] edit phone number
+  - [x] edit login
+  - [x] edit password
+
 * Creating own ads
-    - [ ] create an ad
-    - [ ] watch list of all ads
-    - [ ] maintain an ad
+  - [x] create an ad
+  - [x] watch list of all ads
+  - [x] maintain an ad
 
 * Ad maintaining
-    - [ ] attach photos of a vehicle
-    - [ ] edit description of an ad
-    - [ ] edit cost of a vehicle
-    - [ ] edit title of an ad
+  - [x] attach photos of a vehicle
+  - [x] edit description of an ad
+  - [x] edit cost of a vehicle
+  - [x] edit title of an ad
 
-* Buy vehicle online 
-    - [ ] have personal money account for purchasing
-    - [ ] top up a money account using credit cards and/or E-money
-    - [ ] purchase item if it is marked with the sign "can be bought online"
+* Buy vehicle online
+  - [ ] have personal money account for purchasing
+  - [ ] top up a money account using credit cards and/or E-money
+  - [ ] purchase item if it is marked with the sign "can be bought online"
 
 * Other features
     - [ ] have message conversations with other users

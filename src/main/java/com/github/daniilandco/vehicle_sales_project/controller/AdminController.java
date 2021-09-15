@@ -1,44 +1,59 @@
 package com.github.daniilandco.vehicle_sales_project.controller;
 
-import com.github.daniilandco.vehicle_sales_project.model.user.User;
-import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
+import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
+import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
+import com.github.daniilandco.vehicle_sales_project.service.user.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.stream.StreamSupport;
-
 @RestController
-@RequestMapping("/")
+@RequestMapping("/admin")
 public class AdminController {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserService userService;
+    private final AdService adService;
+
+    public AdminController(UserService userService, AdService adService) {
+        this.userService = userService;
+        this.adService = adService;
+    }
+
 
     @GetMapping("/users")
-    @PreAuthorize("hasAuthority('manage')")
-    public Iterable<User> getAllUsers() {
-        return userRepository.findAll();
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok(new RestApiResponse("ok", userService.getAllUsers()));
+    }
+
+    @GetMapping("/ads")
+    public ResponseEntity<?> getAllAds() {
+        return ResponseEntity.ok(new RestApiResponse("ok", adService.getAllAds()));
     }
 
     @GetMapping("/users/{id}")
-    @PreAuthorize("hasAuthority('manage')")
-    public User getById(@PathVariable Long id) {
-        return StreamSupport.stream(userRepository.findAll().spliterator(), false).
-                filter(user -> user.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        return ResponseEntity
+                .ok(new RestApiResponse("ok", userService.getUserById(id)));
+    }
+
+    @GetMapping("/ads/{id}")
+    public ResponseEntity<?> getAdById(@PathVariable Long id) {
+        return ResponseEntity.ok(new RestApiResponse("ok", adService.getAdById(id)));
     }
 
     @PostMapping("/users")
-    @PreAuthorize("hasAuthority('manage')")
-    public User addUser(@RequestBody User user) {
-        userRepository.save(user);
-        return user;
+    public ResponseEntity<?> addUser(@RequestBody RegisterRequest request) {
+        try {
+            userService.register(request);
+            return ResponseEntity.ok(new RestApiResponse("user is registered"));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new RestApiResponse(e.getMessage()));
+        }
     }
 
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("hasAuthority('manage')")
-    public void deleteById(@PathVariable Long id) {
-        userRepository.deleteById(id);
+    public void deleteUserById(@PathVariable Long id) {
+        userService.deleteUserById(id);
     }
 }

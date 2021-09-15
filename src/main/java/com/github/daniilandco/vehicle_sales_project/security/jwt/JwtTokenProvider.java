@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
 
@@ -38,8 +38,8 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String username) {
-        Claims claims = Jwts.claims().setSubject(username);
+    public String createToken(Long id) {
+        Claims claims = Jwts.claims().setSubject(id.toString());
 
         Date now = new Date(System.currentTimeMillis());
         Date validity = new Date(now.getTime() + validityInSeconds);
@@ -53,17 +53,17 @@ public class JwtTokenProvider {
     }
 
     public boolean validateToken(String token) {
-        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey.getBytes(Charset.forName("UTF-8"))).parseClaimsJws(token);
+        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(token);
         return !claimsJws.getBody().getExpiration().before(new Date());
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));
-        return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), "", userDetails.getAuthorities());
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(getId(token));
+        return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
     }
 
-    public String getUsername(String token) {
-        return Jwts.parser().setSigningKey(secretKey.getBytes(Charset.forName("UTF-8"))).parseClaimsJws(token).getBody().getSubject();
+    public String getId(String token) {
+        return Jwts.parser().setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(token).getBody().getSubject();
     }
 
     public String resolveToken(HttpServletRequest request) {
