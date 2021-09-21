@@ -1,5 +1,6 @@
 package com.github.daniilandco.vehicle_sales_project.service.image;
 
+import com.github.daniilandco.vehicle_sales_project.exception.InvalidImageSizeException;
 import lombok.Data;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,29 +19,34 @@ public class ImageServiceImplementation implements ImageService {
     @Value("${cloud.default.photo.format}")
     private String defaultFormat;
 
-    @Value("${cloud.default.photo.width}")
+    @Value("${cloud.photo.default-width}")
     private int defaultWidth;
 
-    @Value("${cloud.default.photo.height}")
+    @Value("${cloud.photo.default-height}")
     private int defaultHeight;
 
-    public byte[] scaleImage(byte[] bytes) throws IOException {
-        bytes = cropImage(bytes);
-        InputStream is = new ByteArrayInputStream(bytes);
-        BufferedImage image = ImageIO.read(is);
+    @Value("${cloud.photo.max-width}")
+    private int maxWidth;
+
+    @Value("${cloud.photo.max-height}")
+    private int maxHeight;
+
+    public byte[] scaleImage(byte[] bytes) throws IOException, InvalidImageSizeException {
+        BufferedImage image = getBufferedImageFromBytes(cropImage(bytes));
         if (image.getWidth() > defaultWidth) {
             BufferedImage scaledImage = Scalr.resize(image, defaultWidth, defaultHeight);
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ImageIO.write(scaledImage, defaultFormat, byteArrayOutputStream);
-            return byteArrayOutputStream.toByteArray();
+            return convertImage(scaledImage);
         } else {
             return bytes;
         }
     }
 
-    public byte[] cropImage(byte[] bytes) throws IOException {
-        InputStream is = new ByteArrayInputStream(bytes);
-        BufferedImage image = ImageIO.read(is);
+    public byte[] cropImage(byte[] bytes) throws IOException, InvalidImageSizeException {
+        BufferedImage image = getBufferedImageFromBytes(bytes);
+
+        if (!isSizeValid(image)) {
+            throw new InvalidImageSizeException();
+        }
 
         int width = image.getWidth();
         int height = image.getHeight();
@@ -55,17 +61,28 @@ public class ImageServiceImplementation implements ImageService {
 
         BufferedImage croppedImage = image.getSubimage(x0 - newWidth / 2, y0 - newHeight / 2, newWidth, newHeight);
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ImageIO.write(croppedImage, defaultFormat, byteArrayOutputStream);
-        return byteArrayOutputStream.toByteArray();
+        return convertImage(croppedImage);
+    }
+
+    private boolean isSizeValid(BufferedImage image) {
+        return image.getWidth() <= maxWidth && image.getHeight() <= maxHeight;
     }
 
     public byte[] convertImage(byte[] bytes) throws IOException {
-        InputStream is = new ByteArrayInputStream(bytes);
-        BufferedImage bufferedImage = ImageIO.read(is);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, defaultFormat, byteArrayOutputStream);
-        return byteArrayOutputStream.toByteArray();
+        BufferedImage image = getBufferedImageFromBytes(bytes);
+        return convertImage(image);
     }
 
+
+    private BufferedImage getBufferedImageFromBytes(byte[] bytes) throws IOException {
+        InputStream is = new ByteArrayInputStream(bytes);
+        BufferedImage bufferedImage = ImageIO.read(is);
+        return bufferedImage;
+    }
+
+    private byte[] convertImage(BufferedImage image) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(image, defaultFormat, byteArrayOutputStream);
+        return byteArrayOutputStream.toByteArray();
+    }
 }

@@ -2,6 +2,7 @@ package com.github.daniilandco.vehicle_sales_project.controller;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
+import com.github.daniilandco.vehicle_sales_project.exception.InvalidImageSizeException;
 import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
 import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
 import com.github.daniilandco.vehicle_sales_project.service.user.UserService;
@@ -39,7 +40,7 @@ public class UserController {
         try {
             userService.updateProfilePhoto(imageFile.getBytes());
             return ResponseEntity.ok(new RestApiResponse("profile photo is updated"));
-        } catch (IOException | JwtAuthenticationException | UserIsNotLoggedInException e) {
+        } catch (IOException | JwtAuthenticationException | UserIsNotLoggedInException | InvalidImageSizeException e) {
             return ResponseEntity
                     .badRequest()
                     .body((new RestApiResponse("Update profile photo error")));

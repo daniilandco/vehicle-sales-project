@@ -79,7 +79,7 @@ public class AdController {
         try {
             adService.uploadAdPhotos(id, getBytesArrayFromMultipartFileArray(images));
             return ResponseEntity.ok(new RestApiResponse("ad photos are updated"));
-        } catch (IOException | AdNotFoundException | UserIsNotLoggedInException e) {
+        } catch (IOException | AdNotFoundException | UserIsNotLoggedInException | InvalidImageSizeException e) {
             return ResponseEntity
                     .badRequest()
                     .body((new RestApiResponse(e.getMessage())));
