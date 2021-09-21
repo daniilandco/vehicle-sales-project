@@ -1,12 +1,11 @@
 package com.github.daniilandco.vehicle_sales_project.controller;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequest;
+import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByParamsRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
-import com.github.daniilandco.vehicle_sales_project.exception.AdDoesNotBelongToLoggedInUserException;
-import com.github.daniilandco.vehicle_sales_project.exception.AdNotFoundException;
-import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
-import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
+import com.github.daniilandco.vehicle_sales_project.exception.*;
 import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
+import com.github.daniilandco.vehicle_sales_project.service.search.SearchEngineService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,8 +18,11 @@ public class AdController {
 
     private final AdService adService;
 
-    public AdController(AdService adService) {
+    private final SearchEngineService searchEngineService;
+
+    public AdController(AdService adService, SearchEngineService searchEngineService) {
         this.adService = adService;
+        this.searchEngineService = searchEngineService;
     }
 
     @GetMapping("/all")
@@ -45,14 +47,30 @@ public class AdController {
         }
     }
 
+    @GetMapping("/search_request")
+    public ResponseEntity<?> getAdsByParams(@RequestBody SearchByParamsRequest request) {
+        try {
+            return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.getAdsByParams(request)));
+        } catch (CategoryException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body((new RestApiResponse(e.getMessage())));
+        }
+    }
+
+    @GetMapping("/search_query")
+    public ResponseEntity<?> getAdsByQuery(@RequestBody String query) {
+        return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.getAdsByQuery(query)));
+    }
+
     @PostMapping("/new")
     public ResponseEntity<?> newAd(@RequestBody NewAdRequest request) {
         try {
             return ResponseEntity.ok(new RestApiResponse("ok", adService.newAd(request)));
-        } catch (Exception e) {
+        } catch (CategoryException | UserIsNotLoggedInException e) {
             return ResponseEntity
                     .badRequest()
-                    .body(new RestApiResponse(e.getMessage()));
+                    .body((new RestApiResponse(e.getMessage())));
         }
     }
 
@@ -61,7 +79,7 @@ public class AdController {
         try {
             adService.uploadAdPhotos(id, getBytesArrayFromMultipartFileArray(images));
             return ResponseEntity.ok(new RestApiResponse("ad photos are updated"));
-        } catch (Exception e) {
+        } catch (IOException | AdNotFoundException | UserIsNotLoggedInException e) {
             return ResponseEntity
                     .badRequest()
                     .body((new RestApiResponse(e.getMessage())));
@@ -80,7 +98,7 @@ public class AdController {
     public ResponseEntity<?> getMainAdPhoto(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(new RestApiResponse("ok", adService.getAdPhotoById(id, 0)));
-        } catch (Exception e) {
+        } catch (AdNotFoundException | UserIsNotLoggedInException | AdDoesNotBelongToLoggedInUserException e) {
             return ResponseEntity
                     .badRequest()
                     .body((new RestApiResponse(e.getMessage())));
@@ -92,7 +110,7 @@ public class AdController {
         try {
             adService.updateAd(id, request);
             return ResponseEntity.ok(new RestApiResponse("Ad has been updated"));
-        } catch (Exception e) {
+        } catch (CategoryException | AdNotFoundException | UserIsNotLoggedInException e) {
             return ResponseEntity
                     .badRequest()
                     .body(new RestApiResponse(e.getMessage()));
@@ -105,7 +123,7 @@ public class AdController {
             adService.deleteUserAdById(id);
             return ResponseEntity.ok(
                     new RestApiResponse("ad is deleted"));
-        } catch (Exception e) {
+        } catch (AdNotFoundException | UserIsNotLoggedInException | AdDoesNotBelongToLoggedInUserException e) {
             return ResponseEntity
                     .badRequest()
                     .body(new RestApiResponse(e.getMessage()));

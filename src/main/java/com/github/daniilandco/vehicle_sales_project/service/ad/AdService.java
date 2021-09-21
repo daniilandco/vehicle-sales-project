@@ -21,11 +21,11 @@ public interface AdService {
 
     AdDto getAdById(Long id);
 
-    void deleteUserAdById(Long id) throws Exception;
+    void deleteUserAdById(Long id) throws AdNotFoundException, UserIsNotLoggedInException, AdDoesNotBelongToLoggedInUserException;
 
     AdDto getUserAdById(Long id) throws AdDoesNotBelongToLoggedInUserException, AdNotFoundException;
 
-    void uploadAdPhotos(Long id, byte[][] images) throws Exception;
+    void uploadAdPhotos(Long id, byte[][] images) throws UserIsNotLoggedInException, AdNotFoundException;
 
-    URL getAdPhotoById(Long adId, int photoId) throws Exception;
+    URL getAdPhotoById(Long adId, int photoId) throws AdDoesNotBelongToLoggedInUserException, UserIsNotLoggedInException, AdNotFoundException;
 }

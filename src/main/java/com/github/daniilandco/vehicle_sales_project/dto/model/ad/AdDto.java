@@ -3,7 +3,6 @@ package com.github.daniilandco.vehicle_sales_project.dto.model.ad;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.daniilandco.vehicle_sales_project.model.ad.Status;
-import com.github.daniilandco.vehicle_sales_project.model.category.Category;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,7 +28,6 @@ public class AdDto {
     //private UserDto owner;
     private String title;
     private String description;
-    private Category category;
     private BigDecimal price;
     private Timestamp createdAt;
     private Date releaseYear;

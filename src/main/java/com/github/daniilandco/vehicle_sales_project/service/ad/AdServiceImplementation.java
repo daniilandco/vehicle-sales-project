@@ -151,7 +151,7 @@ public class AdServiceImplementation implements AdService {
     }
 
     @Override
-    public URL getAdPhotoById(Long adId, int photoId) throws Exception { // main ad photo name is '0.png'
+    public URL getAdPhotoById(Long adId, int photoId) throws AdDoesNotBelongToLoggedInUserException, UserIsNotLoggedInException, AdNotFoundException { // main ad photo name is '0.png'
         User user = authContextHandler.getLoggedInUser();
         if (user.getAds().contains(adRepository.findById(adId).orElseThrow(() -> new AdDoesNotBelongToLoggedInUserException()))) {
             URL url = googleStorageSignedUrlGenerator.generate(bucketName, getUniqueAdPhotoPath(adId, photoId));
