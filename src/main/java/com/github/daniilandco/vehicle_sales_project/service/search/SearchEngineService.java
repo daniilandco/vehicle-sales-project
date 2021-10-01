@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface SearchEngineService {
+    Iterable<AdDto> searchQuery(String queryRequest);
 
-    Iterable<AdDto> getAdsByQuery(String query);
-
-    Iterable<AdDto> getAdsByParams(SearchByParamsRequest request) throws CategoryException;
+    Iterable<AdDto> searchParams(SearchByParamsRequest request) throws CategoryException;
 }

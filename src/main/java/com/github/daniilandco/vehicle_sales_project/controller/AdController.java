@@ -5,6 +5,7 @@ import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByP
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
 import com.github.daniilandco.vehicle_sales_project.exception.*;
 import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
+import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
 import com.github.daniilandco.vehicle_sales_project.service.search.SearchEngineService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +18,13 @@ import java.io.IOException;
 public class AdController {
 
     private final AdService adService;
-
     private final SearchEngineService searchEngineService;
+    private final ImageService imageService;
 
-    public AdController(AdService adService, SearchEngineService searchEngineService) {
+    public AdController(AdService adService, SearchEngineService searchEngineService, ImageService imageService) {
         this.adService = adService;
         this.searchEngineService = searchEngineService;
+        this.imageService = imageService;
     }
 
     @GetMapping("/all")
@@ -47,10 +49,10 @@ public class AdController {
         }
     }
 
-    @GetMapping("/search_request")
-    public ResponseEntity<?> getAdsByParams(@RequestBody SearchByParamsRequest request) {
+    @GetMapping("/search/params")
+    public ResponseEntity<?> search(@RequestBody SearchByParamsRequest request) {
         try {
-            return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.getAdsByParams(request)));
+            return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.searchParams(request)));
         } catch (CategoryException e) {
             return ResponseEntity
                     .badRequest()
@@ -58,9 +60,9 @@ public class AdController {
         }
     }
 
-    @GetMapping("/search_query")
-    public ResponseEntity<?> getAdsByQuery(@RequestBody String query) {
-        return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.getAdsByQuery(query)));
+    @GetMapping("/search/query")
+    public ResponseEntity<?> search(@RequestBody String query) {
+        return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.searchQuery(query)));
     }
 
     @PostMapping("/new")
@@ -77,7 +79,7 @@ public class AdController {
     @PostMapping("/{id}/upload_photos")
     public ResponseEntity<?> uploadAdPhotos(@PathVariable Long id, @RequestParam("file") MultipartFile[] images) {
         try {
-            adService.uploadAdPhotos(id, getBytesArrayFromMultipartFileArray(images));
+            adService.uploadAdPhotos(id, imageService.getBytesArrayFromMultipartFileArray(images));
             return ResponseEntity.ok(new RestApiResponse("ad photos are updated"));
         } catch (IOException | AdNotFoundException | UserIsNotLoggedInException | InvalidImageSizeException e) {
             return ResponseEntity
@@ -86,13 +88,6 @@ public class AdController {
         }
     }
 
-    private byte[][] getBytesArrayFromMultipartFileArray(MultipartFile[] images) throws IOException {
-        byte[][] bytesArray = new byte[images.length][];
-        for (int i = 0; i < images.length; ++i) {
-            bytesArray[i] = images[i].getBytes();
-        }
-        return bytesArray;
-    }
 
     @GetMapping("/{id}/main_photo")
     public ResponseEntity<?> getMainAdPhoto(@PathVariable Long id) {

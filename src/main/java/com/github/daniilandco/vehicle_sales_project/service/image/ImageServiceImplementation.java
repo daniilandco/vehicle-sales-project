@@ -5,6 +5,7 @@ import lombok.Data;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -62,6 +63,14 @@ public class ImageServiceImplementation implements ImageService {
         BufferedImage croppedImage = image.getSubimage(x0 - newWidth / 2, y0 - newHeight / 2, newWidth, newHeight);
 
         return convertImage(croppedImage);
+    }
+
+    public byte[][] getBytesArrayFromMultipartFileArray(MultipartFile[] images) throws IOException {
+        byte[][] bytesArray = new byte[images.length][];
+        for (int i = 0; i < images.length; ++i) {
+            bytesArray[i] = images[i].getBytes();
+        }
+        return bytesArray;
     }
 
     private boolean isSizeValid(BufferedImage image) {

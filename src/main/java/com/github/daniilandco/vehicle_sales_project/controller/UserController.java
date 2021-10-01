@@ -22,13 +22,12 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PutMapping("/update")
+    @PutMapping("/")
     public ResponseEntity<?> updateProfile(@RequestBody RegisterRequest request) {
         try {
             userService.updateProfile(request);
-            return ResponseEntity
-                    .ok(new RestApiResponse("profile is updated"));
-        } catch (Exception e) {
+            return ResponseEntity.ok(new RestApiResponse("profile is updated"));
+        } catch (UserIsNotLoggedInException e) {
             return ResponseEntity
                     .badRequest()
                     .body(new RestApiResponse("update profile error"));

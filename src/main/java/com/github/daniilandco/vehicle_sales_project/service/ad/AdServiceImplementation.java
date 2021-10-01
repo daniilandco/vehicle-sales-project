@@ -103,6 +103,7 @@ public class AdServiceImplementation implements AdService {
         if (updatedAd.getReleaseYear() != null) {
             ad.setReleaseYear(updatedAd.getReleaseYear());
         }
+        //esService.updateAdIndex(ad);
     }
 
     @Override
