@@ -11,8 +11,8 @@ import java.util.Date;
 // CRUD refers Create, Read, Update, Delete
 
 public interface AdRepository extends CrudRepository<Ad, Long> {
-    Iterable<Ad> findAllByCategoryAfter(Category category);
+    Iterable<Ad> findByCategoryOrderByCreatedAt(Category category);
 
-    Iterable<Ad> findAllByCategoryAfterAndPriceBetweenAndReleaseYearBetween
-            (Category category, BigDecimal left, BigDecimal right, Date leftDate, Date rightDate);
+    Iterable<Ad> findByCategoryAndPriceBetweenAndReleaseYearBetweenOrderByCreatedAt
+            (Category category, BigDecimal leftPrice, BigDecimal rightPrice, Date leftDate, Date rightDate);
 }

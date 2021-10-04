@@ -6,7 +6,9 @@ import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NumericField;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -49,7 +51,6 @@ public class Ad {
             CascadeType.REFRESH
     })
     @JoinColumn(name = "category_id")
-    @ContainedIn
     private Category category;
 
     @Column(name = "price")
@@ -58,14 +59,10 @@ public class Ad {
     private BigDecimal price;
 
     @Column(name = "release_year")
-    @Field
-    @DateBridge(resolution = Resolution.MONTH)
     private Date releaseYear;
 
     @Column(name = "created_at")
     @CreationTimestamp
-    @Field(name = "created_at", store = Store.NO)
-    @SortableField(forField = "created_at")
     private Timestamp createdAt;
 
     @Column(name = "status")

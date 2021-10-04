@@ -8,6 +8,7 @@ import com.github.daniilandco.vehicle_sales_project.service.category.CategorySer
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.jpa.FullTextQuery;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -20,6 +21,8 @@ public class AdHibernateSearchRepositoryImplementation implements AdHibernateSea
 
     private final CategoryService categoryService;
     private final int PAGINATION = 20;
+    @Autowired
+    private AdRepository adRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -28,7 +31,7 @@ public class AdHibernateSearchRepositoryImplementation implements AdHibernateSea
     }
 
     @Override
-    public Iterable<Ad> search(String queryRequest) {
+    public List search(String queryRequest) {
         // get fullTextEntityManager, используя entityManager
         var fullTextEntityManager = org.hibernate.search.jpa.Search.getFullTextEntityManager(entityManager);
 
@@ -97,9 +100,8 @@ public class AdHibernateSearchRepositoryImplementation implements AdHibernateSea
 
         Category category = categoryService.getCategory(request.getCategoriesHierarchy());
 
-        return (Iterable<Ad>) list.stream().filter(ad ->
-                        category.getChildren().contains(((Ad) ad).getCategory())
-                                || category.equals(((Ad) ad).getCategory()))
+        return (Iterable<Ad>) list.stream().filter(ad -> category.equals(((Ad) ad).getCategory()))
                 .collect(Collectors.toList());
+
     }
 }
