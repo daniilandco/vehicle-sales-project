@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.SortableField;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -63,6 +64,8 @@ public class Ad {
 
     @Column(name = "created_at")
     @CreationTimestamp
+    @Field
+    @SortableField
     private Timestamp createdAt;
 
     @Column(name = "status")
