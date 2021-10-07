@@ -1,12 +1,12 @@
 package com.github.daniilandco.vehicle_sales_project.controller;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequest;
+import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByParamsRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
-import com.github.daniilandco.vehicle_sales_project.exception.AdDoesNotBelongToLoggedInUserException;
-import com.github.daniilandco.vehicle_sales_project.exception.AdNotFoundException;
-import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
-import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
+import com.github.daniilandco.vehicle_sales_project.exception.*;
 import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
+import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
+import com.github.daniilandco.vehicle_sales_project.service.search.SearchEngineService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,9 +18,13 @@ import java.io.IOException;
 public class AdController {
 
     private final AdService adService;
+    private final SearchEngineService searchEngineService;
+    private final ImageService imageService;
 
-    public AdController(AdService adService) {
+    public AdController(AdService adService, SearchEngineService searchEngineService, ImageService imageService) {
         this.adService = adService;
+        this.searchEngineService = searchEngineService;
+        this.imageService = imageService;
     }
 
     @GetMapping("/all")
@@ -45,42 +49,51 @@ public class AdController {
         }
     }
 
-    @PostMapping("/new")
-    public ResponseEntity<?> newAd(@RequestBody NewAdRequest request) {
+    @GetMapping("/search/params")
+    public ResponseEntity<?> search(@RequestBody SearchByParamsRequest request) {
         try {
-            return ResponseEntity.ok(new RestApiResponse("ok", adService.newAd(request)));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new RestApiResponse(e.getMessage()));
-        }
-    }
-
-    @PostMapping("/{id}/upload_photos")
-    public ResponseEntity<?> uploadAdPhotos(@PathVariable Long id, @RequestParam("file") MultipartFile[] images) {
-        try {
-            adService.uploadAdPhotos(id, getBytesArrayFromMultipartFileArray(images));
-            return ResponseEntity.ok(new RestApiResponse("ad photos are updated"));
-        } catch (Exception e) {
+            return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.searchParams(request)));
+        } catch (CategoryException e) {
             return ResponseEntity
                     .badRequest()
                     .body((new RestApiResponse(e.getMessage())));
         }
     }
 
-    private byte[][] getBytesArrayFromMultipartFileArray(MultipartFile[] images) throws IOException {
-        byte[][] bytesArray = new byte[images.length][];
-        for (int i = 0; i < images.length; ++i) {
-            bytesArray[i] = images[i].getBytes();
-        }
-        return bytesArray;
+    @GetMapping("/search/query")
+    public ResponseEntity<?> search(@RequestBody String query) {
+        return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.searchQuery(query)));
     }
+
+    @PostMapping("/new")
+    public ResponseEntity<?> newAd(@RequestBody NewAdRequest request) {
+        try {
+            return ResponseEntity.ok(new RestApiResponse("ok", adService.newAd(request)));
+        } catch (CategoryException | UserIsNotLoggedInException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body((new RestApiResponse(e.getMessage())));
+        }
+    }
+
+    @PostMapping("/{id}/upload_photos")
+    public ResponseEntity<?> uploadAdPhotos(@PathVariable Long id, @RequestParam("file") MultipartFile[] images) {
+        try {
+            adService.uploadAdPhotos(id, imageService.getBytesArrayFromMultipartFileArray(images));
+            return ResponseEntity.ok(new RestApiResponse("ad photos are updated"));
+        } catch (IOException | AdNotFoundException | UserIsNotLoggedInException | InvalidImageSizeException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body((new RestApiResponse(e.getMessage())));
+        }
+    }
+
 
     @GetMapping("/{id}/main_photo")
     public ResponseEntity<?> getMainAdPhoto(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(new RestApiResponse("ok", adService.getAdPhotoById(id, 0)));
-        } catch (Exception e) {
+        } catch (AdNotFoundException | UserIsNotLoggedInException | AdDoesNotBelongToLoggedInUserException e) {
             return ResponseEntity
                     .badRequest()
                     .body((new RestApiResponse(e.getMessage())));
@@ -92,7 +105,7 @@ public class AdController {
         try {
             adService.updateAd(id, request);
             return ResponseEntity.ok(new RestApiResponse("Ad has been updated"));
-        } catch (Exception e) {
+        } catch (CategoryException | AdNotFoundException | UserIsNotLoggedInException e) {
             return ResponseEntity
                     .badRequest()
                     .body(new RestApiResponse(e.getMessage()));
@@ -105,7 +118,7 @@ public class AdController {
             adService.deleteUserAdById(id);
             return ResponseEntity.ok(
                     new RestApiResponse("ad is deleted"));
-        } catch (Exception e) {
+        } catch (AdNotFoundException | UserIsNotLoggedInException | AdDoesNotBelongToLoggedInUserException e) {
             return ResponseEntity
                     .badRequest()
                     .body(new RestApiResponse(e.getMessage()));

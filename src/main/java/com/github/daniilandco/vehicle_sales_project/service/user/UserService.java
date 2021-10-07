@@ -3,10 +3,7 @@ package com.github.daniilandco.vehicle_sales_project.service.user;
 import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
-import com.github.daniilandco.vehicle_sales_project.exception.EmailAlreadyExistsException;
-import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
-import com.github.daniilandco.vehicle_sales_project.exception.PhoneNumberAlreadyExistsException;
-import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
+import com.github.daniilandco.vehicle_sales_project.exception.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,7 +33,7 @@ public interface UserService {
      */
     void updateProfile(RegisterRequest request) throws UserIsNotLoggedInException;
 
-    void updateProfilePhoto(byte[] bytes) throws IOException, JwtAuthenticationException, UserIsNotLoggedInException;
+    void updateProfilePhoto(byte[] bytes) throws IOException, JwtAuthenticationException, UserIsNotLoggedInException, InvalidImageSizeException;
 
     void deleteProfilePhoto() throws JwtAuthenticationException, UserIsNotLoggedInException;
 

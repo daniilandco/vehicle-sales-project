@@ -2,6 +2,9 @@ package com.github.daniilandco.vehicle_sales_project.controller;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
+import com.github.daniilandco.vehicle_sales_project.exception.EmailAlreadyExistsException;
+import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.exception.PhoneNumberAlreadyExistsException;
 import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
 import com.github.daniilandco.vehicle_sales_project.service.user.UserService;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +48,7 @@ public class AdminController {
         try {
             userService.register(request);
             return ResponseEntity.ok(new RestApiResponse("user is registered"));
-        } catch (Exception e) {
+        } catch (EmailAlreadyExistsException | JwtAuthenticationException | PhoneNumberAlreadyExistsException e) {
             return ResponseEntity
                     .badRequest()
                     .body(new RestApiResponse(e.getMessage()));

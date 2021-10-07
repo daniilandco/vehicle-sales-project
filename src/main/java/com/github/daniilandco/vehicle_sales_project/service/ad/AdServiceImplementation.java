@@ -3,10 +3,7 @@ package com.github.daniilandco.vehicle_sales_project.service.ad;
 import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.mapper.AdMapper;
 import com.github.daniilandco.vehicle_sales_project.dto.model.ad.AdDto;
-import com.github.daniilandco.vehicle_sales_project.exception.AdDoesNotBelongToLoggedInUserException;
-import com.github.daniilandco.vehicle_sales_project.exception.AdNotFoundException;
-import com.github.daniilandco.vehicle_sales_project.exception.CategoryException;
-import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
+import com.github.daniilandco.vehicle_sales_project.exception.*;
 import com.github.daniilandco.vehicle_sales_project.model.ad.Ad;
 import com.github.daniilandco.vehicle_sales_project.model.photos.AdPhoto;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
@@ -15,12 +12,14 @@ import com.github.daniilandco.vehicle_sales_project.repository.user.UserReposito
 import com.github.daniilandco.vehicle_sales_project.security.AuthContextHandler;
 import com.github.daniilandco.vehicle_sales_project.service.category.CategoryService;
 import com.github.daniilandco.vehicle_sales_project.service.gcs.GoogleStorageSignedUrlGenerator;
+import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +34,7 @@ public class AdServiceImplementation implements AdService {
     private final GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator;
     private final AuthContextHandler authContextHandler;
     private final CategoryService categoryService;
+    private final ImageService imageService;
 
     @Value("${cloud.bucketname}")
     private String bucketName;
@@ -43,7 +43,7 @@ public class AdServiceImplementation implements AdService {
     @Value("${cloud.subdirectory.ad}")
     private String adPhotosPath;
 
-    public AdServiceImplementation(UserRepository userRepository, AdRepository adRepository, Storage storage, AdMapper adMapper, GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator, AuthContextHandler authContextHandler, CategoryService categoryService) {
+    public AdServiceImplementation(UserRepository userRepository, AdRepository adRepository, Storage storage, AdMapper adMapper, GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator, AuthContextHandler authContextHandler, CategoryService categoryService, ImageService imageService) {
         this.userRepository = userRepository;
         this.adRepository = adRepository;
         this.storage = storage;
@@ -51,6 +51,7 @@ public class AdServiceImplementation implements AdService {
         this.googleStorageSignedUrlGenerator = googleStorageSignedUrlGenerator;
         this.authContextHandler = authContextHandler;
         this.categoryService = categoryService;
+        this.imageService = imageService;
     }
 
     @Override
@@ -102,6 +103,7 @@ public class AdServiceImplementation implements AdService {
         if (updatedAd.getReleaseYear() != null) {
             ad.setReleaseYear(updatedAd.getReleaseYear());
         }
+        //esService.updateAdIndex(ad);
     }
 
     @Override
@@ -135,14 +137,14 @@ public class AdServiceImplementation implements AdService {
     }
 
     @Override
-    public void uploadAdPhotos(Long id, byte[][] images) throws UserIsNotLoggedInException, AdNotFoundException {
+    public void uploadAdPhotos(Long id, byte[][] images) throws UserIsNotLoggedInException, AdNotFoundException, IOException, InvalidImageSizeException {
         User user = authContextHandler.getLoggedInUser();
         Ad ad = user.getAds().stream().filter(adModel -> adModel.getId().equals(id)).findFirst().orElseThrow(() -> new AdNotFoundException("ad doesn't exist or belong to logged in user"));
         for (byte[] bytes : images) {
             for (int counter = 0; counter < images.length; ++counter) {
                 BlobId blobId = BlobId.of(bucketName, getUniqueAdPhotoPath(id, counter));
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-                storage.create(blobInfo, bytes);
+                storage.create(blobInfo, imageService.scaleImage(bytes));
 
                 ad.getPhotos().add(new AdPhoto(ad, getUniqueAdPhotoPath(id, counter)));
                 adRepository.save(ad);
@@ -151,7 +153,7 @@ public class AdServiceImplementation implements AdService {
     }
 
     @Override
-    public URL getAdPhotoById(Long adId, int photoId) throws Exception { // main ad photo name is '0.png'
+    public URL getAdPhotoById(Long adId, int photoId) throws AdDoesNotBelongToLoggedInUserException, UserIsNotLoggedInException, AdNotFoundException { // main ad photo name is '0.png'
         User user = authContextHandler.getLoggedInUser();
         if (user.getAds().contains(adRepository.findById(adId).orElseThrow(() -> new AdDoesNotBelongToLoggedInUserException()))) {
             URL url = googleStorageSignedUrlGenerator.generate(bucketName, getUniqueAdPhotoPath(adId, photoId));

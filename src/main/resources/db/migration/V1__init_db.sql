@@ -32,7 +32,7 @@ create TABLE `Ad`
              )
              engine=innodb;
 
-create TABLE `AdPhoto`
+create TABLE `Ad_Photo`
               (
                          `id`    BIGINT NOT NULL auto_increment,
                          `ad_id` BIGINT NOT NULL,

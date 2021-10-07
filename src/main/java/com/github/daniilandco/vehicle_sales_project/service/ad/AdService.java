@@ -4,6 +4,7 @@ import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequ
 import com.github.daniilandco.vehicle_sales_project.dto.model.ad.AdDto;
 import com.github.daniilandco.vehicle_sales_project.exception.*;
 
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -21,11 +22,11 @@ public interface AdService {
 
     AdDto getAdById(Long id);
 
-    void deleteUserAdById(Long id) throws Exception;
+    void deleteUserAdById(Long id) throws AdNotFoundException, UserIsNotLoggedInException, AdDoesNotBelongToLoggedInUserException;
 
     AdDto getUserAdById(Long id) throws AdDoesNotBelongToLoggedInUserException, AdNotFoundException;
 
-    void uploadAdPhotos(Long id, byte[][] images) throws Exception;
+    void uploadAdPhotos(Long id, byte[][] images) throws UserIsNotLoggedInException, AdNotFoundException, IOException, InvalidImageSizeException;
 
-    URL getAdPhotoById(Long adId, int photoId) throws Exception;
+    URL getAdPhotoById(Long adId, int photoId) throws AdDoesNotBelongToLoggedInUserException, UserIsNotLoggedInException, AdNotFoundException;
 }

@@ -6,6 +6,10 @@ import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.SortableField;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -17,6 +21,7 @@ import java.util.Set;
 @Setter
 @Entity(name = "Ad") // This tells Hibernate to make a table out of this class
 @Table(name = "Ad")
+@Indexed
 public class Ad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,9 +38,11 @@ public class Ad {
     private User author;
 
     @Column(name = "title")
+    @Field
     private String title;
 
     @Column(name = "description")
+    @Field
     private String description;
 
     @ManyToOne(cascade = {
@@ -48,6 +55,8 @@ public class Ad {
     private Category category;
 
     @Column(name = "price")
+    @Field
+    @NumericField
     private BigDecimal price;
 
     @Column(name = "release_year")
@@ -55,6 +64,8 @@ public class Ad {
 
     @Column(name = "created_at")
     @CreationTimestamp
+    @Field
+    @SortableField
     private Timestamp createdAt;
 
     @Column(name = "status")
@@ -63,6 +74,7 @@ public class Ad {
 
     @OneToMany(mappedBy = "ad", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<AdPhoto> photos;
+
 
     public Ad() {
     }
@@ -76,5 +88,4 @@ public class Ad {
         this.releaseYear = releaseYear;
         this.status = status;
     }
-
 }

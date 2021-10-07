@@ -62,11 +62,11 @@ Of course, users should have opportunity to search ads which are suitable for th
 
 ***1. Parameters for ad search filter***
 
-- [ ] type of vehicle (car, motorbike, tractor etc.) {car}
-- [ ] brand {audi}
-- [ ] model {A8 D4}
-- [ ] release year {2015}
-- [ ] price range {10 - 15$ thousand}
+- [x] type of vehicle (car, motorbike, tractor etc.) {car}
+- [x] brand {audi}
+- [x] model {A8 D4}
+- [x] release year {2015}
+- [x] price range {10 - 15$ thousand}
 - [ ] ad's location {Minsk}
 
 > Note: the content in { ... } is just a sample.
@@ -78,9 +78,9 @@ Of course, users should have opportunity to search ads which are suitable for th
     - [x] email
     - [x] password
     - [x] name
-- [ ] search and watch any ad out
-- [ ] find out common information about the service  
 
+- [x] search and watch any ad out
+- [ ] find out common information about the service
 
 ***3. Registered users can do (additionally)***
 

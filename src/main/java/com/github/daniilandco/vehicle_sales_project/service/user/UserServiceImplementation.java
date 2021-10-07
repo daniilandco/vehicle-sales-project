@@ -5,6 +5,7 @@ import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterR
 import com.github.daniilandco.vehicle_sales_project.dto.mapper.UserMapper;
 import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
 import com.github.daniilandco.vehicle_sales_project.exception.EmailAlreadyExistsException;
+import com.github.daniilandco.vehicle_sales_project.exception.InvalidImageSizeException;
 import com.github.daniilandco.vehicle_sales_project.exception.PhoneNumberAlreadyExistsException;
 import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
@@ -143,7 +144,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void updateProfilePhoto(byte[] bytes) throws IOException, UserIsNotLoggedInException {
+    public void updateProfilePhoto(byte[] bytes) throws IOException, UserIsNotLoggedInException, InvalidImageSizeException {
         User userModel = authContextHandler.getLoggedInUser();
 
         if (userModel.getProfilePhoto() != null) {
