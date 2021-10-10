@@ -15,4 +15,5 @@ public interface AdRepository extends CrudRepository<Ad, Long> {
 
     Iterable<Ad> findByCategoryAndPriceBetweenAndReleaseYearBetweenOrderByCreatedAt
             (Category category, BigDecimal leftPrice, BigDecimal rightPrice, Date leftDate, Date rightDate);
+
 }

@@ -6,15 +6,11 @@ import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.NumericField;
-import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.annotations.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.Set;
 
 @Getter
@@ -38,11 +34,12 @@ public class Ad {
     private User author;
 
     @Column(name = "title")
-    @Field
+    @Field(store = Store.NO)
+    @SortableField
     private String title;
 
     @Column(name = "description")
-    @Field
+    @Field(store = Store.NO)
     private String description;
 
     @ManyToOne(cascade = {
@@ -55,18 +52,20 @@ public class Ad {
     private Category category;
 
     @Column(name = "price")
-    @Field
-    @NumericField
+    @Field(analyze = Analyze.NO, store = Store.NO)
     private BigDecimal price;
 
     @Column(name = "release_year")
+    @Field(name = "release_year", store = Store.NO)
+    @DateBridge(resolution = Resolution.YEAR)
     private Date releaseYear;
 
     @Column(name = "created_at")
     @CreationTimestamp
-    @Field
-    @SortableField
-    private Timestamp createdAt;
+    @Field(name = "created_at", analyze = Analyze.NO, store = Store.NO)
+    @SortableField(forField = "created_at")
+    @DateBridge(resolution = Resolution.SECOND)
+    private Date createdAt;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

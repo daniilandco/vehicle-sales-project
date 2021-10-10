@@ -11,7 +11,6 @@ import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.sql.Timestamp;
 
 /**
  * Created by Daniel Bondarkov.
@@ -29,7 +28,7 @@ public class AdDto {
     private String title;
     private String description;
     private BigDecimal price;
-    private Timestamp createdAt;
+    private Date createdAt;
     private Date releaseYear;
     private Status status;
 }
