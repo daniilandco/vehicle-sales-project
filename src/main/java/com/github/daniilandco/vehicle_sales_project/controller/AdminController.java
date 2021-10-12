@@ -2,6 +2,7 @@ package com.github.daniilandco.vehicle_sales_project.controller;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
+import com.github.daniilandco.vehicle_sales_project.exception.AdNotFoundException;
 import com.github.daniilandco.vehicle_sales_project.exception.EmailAlreadyExistsException;
 import com.github.daniilandco.vehicle_sales_project.exception.JwtAuthenticationException;
 import com.github.daniilandco.vehicle_sales_project.exception.PhoneNumberAlreadyExistsException;
@@ -40,7 +41,13 @@ public class AdminController {
 
     @GetMapping("/ads/{id}")
     public ResponseEntity<?> getAdById(@PathVariable Long id) {
-        return ResponseEntity.ok(new RestApiResponse("ok", adService.getAdById(id)));
+        try {
+            return ResponseEntity.ok(new RestApiResponse("ok", adService.getAdById(id)));
+        } catch (AdNotFoundException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new RestApiResponse(e.getMessage()));
+        }
     }
 
     @PostMapping("/users")

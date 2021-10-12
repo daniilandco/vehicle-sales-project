@@ -1,20 +1,27 @@
 package com.github.daniilandco.vehicle_sales_project.controller.request;
 
-import lombok.Data;
-import org.springframework.data.util.Pair;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
-@Data
-public class SearchByParamsRequest {
-    private Pair<BigDecimal, BigDecimal> priceRange;
+@Getter
+@Setter
+public class SearchByParamsRequest extends PagePaginationRequest {
+    private BigDecimal priceFrom;
+    private BigDecimal priceTo;
+
     private String[] categoriesHierarchy;
-    private Pair<Date, Date> releaseYearRange;
 
-    public SearchByParamsRequest(Pair<BigDecimal, BigDecimal> priceRange, String[] categoriesHierarchy, Pair<Date, Date> releaseYearRange) {
-        this.priceRange = priceRange;
+    private Date releaseYearFrom;
+    private Date releaseYearTo;
+
+    public SearchByParamsRequest(BigDecimal priceFrom, BigDecimal priceTo, String[] categoriesHierarchy, Date releaseYearFrom, Date releaseYearTo) {
+        this.priceFrom = priceFrom;
+        this.priceTo = priceTo;
         this.categoriesHierarchy = categoriesHierarchy;
-        this.releaseYearRange = releaseYearRange;
+        this.releaseYearFrom = releaseYearFrom;
+        this.releaseYearTo = releaseYearTo;
     }
 }

@@ -23,6 +23,7 @@ public class AdMapper {
                 .setId(ad.getId())
                 //.setOwner(UserMapper.toUserDto(ad.getAuthor()))
                 .setTitle(ad.getTitle())
+                .setCategory(ad.getCategory())
                 .setDescription(ad.getDescription())
                 .setPrice(ad.getPrice())
                 .setCreatedAt(ad.getCreatedAt())

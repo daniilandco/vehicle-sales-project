@@ -7,6 +7,7 @@ import com.github.daniilandco.vehicle_sales_project.exception.*;
 import com.github.daniilandco.vehicle_sales_project.model.ad.Ad;
 import com.github.daniilandco.vehicle_sales_project.model.photos.AdPhoto;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
+import com.github.daniilandco.vehicle_sales_project.repository.ad.AdElasticSearchRepository;
 import com.github.daniilandco.vehicle_sales_project.repository.ad.AdRepository;
 import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
 import com.github.daniilandco.vehicle_sales_project.security.AuthContextHandler;
@@ -16,6 +17,7 @@ import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,8 @@ import java.util.stream.StreamSupport;
 public class AdServiceImplementation implements AdService {
     private final UserRepository userRepository;
     private final AdRepository adRepository;
+    @Autowired
+    private AdElasticSearchRepository adElasticSearchRepository;
     private final Storage storage;
     private final AdMapper adMapper;
     private final GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator;
@@ -60,11 +64,8 @@ public class AdServiceImplementation implements AdService {
     }
 
     @Override
-    public AdDto getAdById(Long id) {
-        AdDto adDto = adMapper.toAdDto(Objects.requireNonNull(StreamSupport.stream(adRepository.findAll().spliterator(), false).
-                filter(ad -> ad.getId().equals(id))
-                .findFirst()
-                .orElse(null)));
+    public AdDto getAdById(Long id) throws AdNotFoundException {
+        AdDto adDto = adMapper.toAdDto(getAdModelById(id));
         return adDto;
     }
 
@@ -73,8 +74,15 @@ public class AdServiceImplementation implements AdService {
         User userModel = authContextHandler.getLoggedInUser();
         Ad ad = new Ad(userModel, request.getTitle(), request.getDescription(), categoryService.getCategory(request.getCategoriesHierarchy()), request.getPrice(), request.getReleaseYear(), request.getStatus());
         userModel.getAds().add(ad);
-        userRepository.save(userModel);
-        return adMapper.toAdDto(ad);
+
+        userRepository.save(userModel); // updates list of ads of logged-in user
+
+        var updatedAdsList = userModel.getAds();
+        Ad adWithGeneratedId = updatedAdsList.get(updatedAdsList.size() - 1);
+
+        adElasticSearchRepository.save(adWithGeneratedId); // saves new ad in elastic search index
+
+        return adMapper.toAdDto(adWithGeneratedId);
     }
 
     @Override
@@ -103,7 +111,9 @@ public class AdServiceImplementation implements AdService {
         if (updatedAd.getReleaseYear() != null) {
             ad.setReleaseYear(updatedAd.getReleaseYear());
         }
-        //esService.updateAdIndex(ad);
+
+        userRepository.save(user); // update ad of logged-in user
+        adElasticSearchRepository.save(ad); // update ad in elastic search index
     }
 
     @Override
@@ -112,13 +122,16 @@ public class AdServiceImplementation implements AdService {
         if (adRepository.existsById(id) && user.getAds().contains(getAdModelById(id))) {
             user.getAds().remove(user.getAds().stream().filter(ad -> ad.getId().equals(id)).findFirst().orElseThrow(() -> new AdDoesNotBelongToLoggedInUserException()));
             userRepository.save(user);
+
             adRepository.deleteById(id);
+            adElasticSearchRepository.deleteById(id);
         } else {
             throw new AdNotFoundException();
         }
     }
 
-    private Ad getAdModelById(Long id) throws AdNotFoundException {
+    @Override
+    public Ad getAdModelById(Long id) throws AdNotFoundException {
         Optional<Ad> ad = adRepository.findById(id);
         if (ad.isPresent()) {
             return ad.get();
