@@ -6,7 +6,10 @@ import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.search.annotations.*;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.Setting;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -17,11 +20,13 @@ import java.util.Set;
 @Setter
 @Entity(name = "Ad") // This tells Hibernate to make a table out of this class
 @Table(name = "Ad")
-@Indexed
+@Document(indexName = Indices.AD_INDEX)
+@Setting(settingPath = "static/es-settings.json")
 public class Ad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
+    @Field(type = FieldType.Long)
     private Long id;
 
     @ManyToOne(cascade = {
@@ -31,15 +36,15 @@ public class Ad {
             CascadeType.REFRESH
     })
     @JoinColumn(name = "author_id")
+    @org.springframework.data.annotation.Transient
     private User author;
 
     @Column(name = "title")
-    @Field(store = Store.NO)
-    @SortableField
+    @Field(type = FieldType.Text)
     private String title;
 
     @Column(name = "description")
-    @Field(store = Store.NO)
+    @Field(type = FieldType.Text)
     private String description;
 
     @ManyToOne(cascade = {
@@ -49,29 +54,29 @@ public class Ad {
             CascadeType.REFRESH
     })
     @JoinColumn(name = "category_id")
+    @org.springframework.data.annotation.Transient
     private Category category;
 
     @Column(name = "price")
-    @Field(analyze = Analyze.NO, store = Store.NO)
+    @Field(type = FieldType.Double)
     private BigDecimal price;
 
     @Column(name = "release_year")
-    @Field(name = "release_year", store = Store.NO)
-    @DateBridge(resolution = Resolution.YEAR)
+    @Field(type = FieldType.Date)
     private Date releaseYear;
 
     @Column(name = "created_at")
     @CreationTimestamp
-    @Field(name = "created_at", analyze = Analyze.NO, store = Store.NO)
-    @SortableField(forField = "created_at")
-    @DateBridge(resolution = Resolution.SECOND)
+    @Field(type = FieldType.Date)
     private Date createdAt;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
+    @org.springframework.data.annotation.Transient
     private Status status;
 
     @OneToMany(mappedBy = "ad", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @org.springframework.data.annotation.Transient
     private Set<AdPhoto> photos;
 
 

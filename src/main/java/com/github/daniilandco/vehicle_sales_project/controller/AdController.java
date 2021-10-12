@@ -2,6 +2,7 @@ package com.github.daniilandco.vehicle_sales_project.controller;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByParamsRequest;
+import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByQueryRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
 import com.github.daniilandco.vehicle_sales_project.exception.*;
 import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
@@ -18,13 +19,13 @@ import java.io.IOException;
 public class AdController {
 
     private final AdService adService;
-    private final SearchEngineService searchEngineService;
     private final ImageService imageService;
+    private final SearchEngineService searchEngineService;
 
-    public AdController(AdService adService, SearchEngineService searchEngineService, ImageService imageService) {
+    public AdController(AdService adService, ImageService imageService, SearchEngineService searchEngineService) {
         this.adService = adService;
-        this.searchEngineService = searchEngineService;
         this.imageService = imageService;
+        this.searchEngineService = searchEngineService;
     }
 
     @GetMapping("/all")
@@ -52,8 +53,8 @@ public class AdController {
     @GetMapping("/search/params")
     public ResponseEntity<?> search(@RequestBody SearchByParamsRequest request) {
         try {
-            return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.searchParams(request)));
-        } catch (CategoryException e) {
+            return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.search(request)));
+        } catch (IOException | AdNotFoundException | CategoryException e) {
             return ResponseEntity
                     .badRequest()
                     .body((new RestApiResponse(e.getMessage())));
@@ -61,8 +62,14 @@ public class AdController {
     }
 
     @GetMapping("/search/query")
-    public ResponseEntity<?> search(@RequestBody String query) {
-        return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.searchQuery(query)));
+    public ResponseEntity<?> search(@RequestBody SearchByQueryRequest request) {
+        try {
+            return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.search(request)));
+        } catch (IOException | AdNotFoundException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body((new RestApiResponse(e.getMessage())));
+        }
     }
 
     @PostMapping("/new")
@@ -100,7 +107,7 @@ public class AdController {
         }
     }
 
-    @PutMapping("/{id}/update")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateAd(@PathVariable Long id, @RequestBody NewAdRequest request) {
         try {
             adService.updateAd(id, request);
@@ -112,7 +119,7 @@ public class AdController {
         }
     }
 
-    @DeleteMapping("/{id}/delete")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAdById(@PathVariable Long id) {
         try {
             adService.deleteUserAdById(id);

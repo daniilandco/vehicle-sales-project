@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -65,7 +65,7 @@ public class User implements UserDetails {
     private Timestamp lastLogin;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Ad> ads;
+    private List<Ad> ads;
 
     public User() {
     }

@@ -1,10 +1,10 @@
 package com.github.daniilandco.vehicle_sales_project.model.category;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -19,10 +19,11 @@ public class Category {
     @Column(name = "category_name")
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Category parent;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parent")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "parent")
+    @JsonBackReference
     private Set<Category> children;
 
     public Category() {
@@ -32,13 +33,17 @@ public class Category {
         this.name = name;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Category category = (Category) o;
-        return Objects.equals(id, category.id) || category.getChildren().contains(this);
+
+    public boolean isRelative(Category requestCategory) {
+        if (this == requestCategory) return true;
+        if (requestCategory == null) return false;
+
+        for (var kid : requestCategory.getChildren()) {
+            if (isRelative(kid)) {
+                return true;
+            }
+        }
+
+        return false;
     }
-
-
 }

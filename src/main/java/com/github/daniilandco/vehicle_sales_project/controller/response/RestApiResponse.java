@@ -1,8 +1,10 @@
 package com.github.daniilandco.vehicle_sales_project.controller.response;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class RestApiResponse {
 
     private String message;

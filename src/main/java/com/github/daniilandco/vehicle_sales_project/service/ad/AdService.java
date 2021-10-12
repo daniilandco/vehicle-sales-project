@@ -3,6 +3,7 @@ package com.github.daniilandco.vehicle_sales_project.service.ad;
 import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.model.ad.AdDto;
 import com.github.daniilandco.vehicle_sales_project.exception.*;
+import com.github.daniilandco.vehicle_sales_project.model.ad.Ad;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,9 +21,11 @@ public interface AdService {
 
     void updateAd(Long id, NewAdRequest updatedAd) throws UserIsNotLoggedInException, CategoryException, AdNotFoundException;
 
-    AdDto getAdById(Long id);
+    AdDto getAdById(Long id) throws AdNotFoundException;
 
     void deleteUserAdById(Long id) throws AdNotFoundException, UserIsNotLoggedInException, AdDoesNotBelongToLoggedInUserException;
+
+    Ad getAdModelById(Long id) throws AdNotFoundException;
 
     AdDto getUserAdById(Long id) throws AdDoesNotBelongToLoggedInUserException, AdNotFoundException;
 
