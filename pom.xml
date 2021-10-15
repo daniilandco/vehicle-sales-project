@@ -26,9 +26,6 @@
             <properties>
                 <activatedProperties>dev</activatedProperties>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
         <profile>
             <id>stage</id>

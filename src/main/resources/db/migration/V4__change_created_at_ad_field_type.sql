@@ -1,0 +1,2 @@
+ALTER TABLE Ad
+  MODIFY created_at DATE;

@@ -21,7 +21,6 @@ public class AdMapper {
     public AdDto toAdDto(Ad ad) {
         return new AdDto()
                 .setId(ad.getId())
-                //.setOwner(UserMapper.toUserDto(ad.getAuthor()))
                 .setTitle(ad.getTitle())
                 .setCategory(ad.getCategory())
                 .setDescription(ad.getDescription())

@@ -2,7 +2,6 @@ package com.github.daniilandco.vehicle_sales_project.config;
 
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -33,7 +32,6 @@ public class ElasticSearchConfiguration extends AbstractElasticsearchConfigurati
     @Profile({"stage"})
     public RestHighLevelClient elasticsearchClientStage() {
         URI elasticUri = URI.create(elasticsearchUrl);
-
         String[] credentials = elasticUri.getUserInfo().split(":");
         final ClientConfiguration configuration = ClientConfiguration.builder()
                 .connectedTo(elasticUri.getAuthority().split("@")[1])

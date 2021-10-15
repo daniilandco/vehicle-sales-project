@@ -15,7 +15,7 @@ public interface UserService {
     /**
      * Register a new user
      */
-    void register(RegisterRequest request) throws JwtAuthenticationException, EmailAlreadyExistsException, PhoneNumberAlreadyExistsException;
+    UserDto register(RegisterRequest request) throws JwtAuthenticationException, EmailAlreadyExistsException, PhoneNumberAlreadyExistsException, RegistrationException;
 
     Iterable<UserDto> getAllUsers();
 

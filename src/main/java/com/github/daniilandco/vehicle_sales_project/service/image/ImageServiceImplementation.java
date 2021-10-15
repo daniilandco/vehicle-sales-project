@@ -61,7 +61,6 @@ public class ImageServiceImplementation implements ImageService {
         int y0 = height / 2; // set y coordinate of image centre
 
         BufferedImage croppedImage = image.getSubimage(x0 - newWidth / 2, y0 - newHeight / 2, newWidth, newHeight);
-
         return convertImage(croppedImage);
     }
 
@@ -85,8 +84,7 @@ public class ImageServiceImplementation implements ImageService {
 
     private BufferedImage getBufferedImageFromBytes(byte[] bytes) throws IOException {
         InputStream is = new ByteArrayInputStream(bytes);
-        BufferedImage bufferedImage = ImageIO.read(is);
-        return bufferedImage;
+        return ImageIO.read(is);
     }
 
     private byte[] convertImage(BufferedImage image) throws IOException {
