@@ -3,8 +3,8 @@ package com.github.daniilandco.vehicle_sales_project.service.search;
 import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByParamsRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByQueryRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.model.ad.AdDto;
-import com.github.daniilandco.vehicle_sales_project.exception.AdNotFoundException;
-import com.github.daniilandco.vehicle_sales_project.exception.CategoryException;
+import com.github.daniilandco.vehicle_sales_project.exception.ad.AdNotFoundException;
+import com.github.daniilandco.vehicle_sales_project.exception.category.CategoryException;
 
 import java.io.IOException;
 

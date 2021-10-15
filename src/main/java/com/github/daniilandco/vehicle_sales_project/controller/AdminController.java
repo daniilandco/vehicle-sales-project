@@ -2,7 +2,11 @@ package com.github.daniilandco.vehicle_sales_project.controller;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
-import com.github.daniilandco.vehicle_sales_project.exception.*;
+import com.github.daniilandco.vehicle_sales_project.exception.ad.AdNotFoundException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.EmailAlreadyExistsException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.PhoneNumberAlreadyExistsException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.RegistrationException;
 import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
 import com.github.daniilandco.vehicle_sales_project.service.user.UserService;
 import org.springframework.http.ResponseEntity;

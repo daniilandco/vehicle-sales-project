@@ -1,4 +1,4 @@
-package com.github.daniilandco.vehicle_sales_project.exception;
+package com.github.daniilandco.vehicle_sales_project.exception.image;
 
 public class InvalidImageSizeException extends Exception {
     public InvalidImageSizeException() {

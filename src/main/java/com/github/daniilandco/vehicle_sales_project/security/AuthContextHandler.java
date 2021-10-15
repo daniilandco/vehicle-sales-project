@@ -1,6 +1,6 @@
 package com.github.daniilandco.vehicle_sales_project.security;
 
-import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.UserIsNotLoggedInException;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;

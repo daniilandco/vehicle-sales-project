@@ -3,7 +3,8 @@ package com.github.daniilandco.vehicle_sales_project.service.user;
 import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
-import com.github.daniilandco.vehicle_sales_project.exception.*;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.*;
+import com.github.daniilandco.vehicle_sales_project.exception.image.InvalidImageSizeException;
 
 import java.io.IOException;
 import java.net.URL;

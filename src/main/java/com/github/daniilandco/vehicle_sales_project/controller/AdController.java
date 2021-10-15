@@ -4,7 +4,12 @@ import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequ
 import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByParamsRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByQueryRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
-import com.github.daniilandco.vehicle_sales_project.exception.*;
+import com.github.daniilandco.vehicle_sales_project.exception.ad.AdDoesNotBelongToLoggedInUserException;
+import com.github.daniilandco.vehicle_sales_project.exception.ad.AdNotFoundException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.UserIsNotLoggedInException;
+import com.github.daniilandco.vehicle_sales_project.exception.category.CategoryException;
+import com.github.daniilandco.vehicle_sales_project.exception.image.InvalidImageSizeException;
 import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
 import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
 import com.github.daniilandco.vehicle_sales_project.service.search.SearchEngineService;

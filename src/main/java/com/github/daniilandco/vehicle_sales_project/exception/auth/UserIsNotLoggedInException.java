@@ -1,4 +1,4 @@
-package com.github.daniilandco.vehicle_sales_project.exception;
+package com.github.daniilandco.vehicle_sales_project.exception.auth;
 
 public class UserIsNotLoggedInException extends Exception {
     public UserIsNotLoggedInException() {

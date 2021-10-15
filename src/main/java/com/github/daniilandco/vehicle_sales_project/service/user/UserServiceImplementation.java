@@ -4,7 +4,11 @@ import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequ
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.mapper.UserMapper;
 import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
-import com.github.daniilandco.vehicle_sales_project.exception.*;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.EmailAlreadyExistsException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.PhoneNumberAlreadyExistsException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.RegistrationException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.UserIsNotLoggedInException;
+import com.github.daniilandco.vehicle_sales_project.exception.image.InvalidImageSizeException;
 import com.github.daniilandco.vehicle_sales_project.model.user.Role;
 import com.github.daniilandco.vehicle_sales_project.model.user.Status;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;

@@ -1,6 +1,6 @@
 package com.github.daniilandco.vehicle_sales_project.service.image;
 
-import com.github.daniilandco.vehicle_sales_project.exception.InvalidImageSizeException;
+import com.github.daniilandco.vehicle_sales_project.exception.image.InvalidImageSizeException;
 import lombok.Data;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;

@@ -2,7 +2,12 @@ package com.github.daniilandco.vehicle_sales_project.service.ad;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.model.ad.AdDto;
-import com.github.daniilandco.vehicle_sales_project.exception.*;
+import com.github.daniilandco.vehicle_sales_project.exception.ad.AdDoesNotBelongToLoggedInUserException;
+import com.github.daniilandco.vehicle_sales_project.exception.ad.AdNotFoundException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.JwtAuthenticationException;
+import com.github.daniilandco.vehicle_sales_project.exception.auth.UserIsNotLoggedInException;
+import com.github.daniilandco.vehicle_sales_project.exception.category.CategoryException;
+import com.github.daniilandco.vehicle_sales_project.exception.image.InvalidImageSizeException;
 import com.github.daniilandco.vehicle_sales_project.model.ad.Ad;
 
 import java.io.IOException;
