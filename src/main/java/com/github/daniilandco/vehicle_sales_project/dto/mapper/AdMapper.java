@@ -11,11 +11,14 @@ import java.util.Set;
 public class AdMapper {
 
     public Iterable<AdDto> toAdDtoSet(Iterable<Ad> adSet) {
-        Set<AdDto> adDtoSet = new HashSet<>();
-        for (Ad ad : adSet) {
-            adDtoSet.add(toAdDto(ad));
+        if (adSet != null) {
+            Set<AdDto> adDtoSet = new HashSet<>();
+            for (Ad ad : adSet) {
+                adDtoSet.add(toAdDto(ad));
+            }
+            return adDtoSet;
         }
-        return adDtoSet;
+        return null;
     }
 
     public AdDto toAdDto(Ad ad) {
