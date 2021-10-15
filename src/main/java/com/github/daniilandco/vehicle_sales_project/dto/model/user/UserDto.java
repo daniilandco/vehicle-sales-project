@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDto {
+    private Long id;
     private String email;
     private String password;
     private String firstName;
