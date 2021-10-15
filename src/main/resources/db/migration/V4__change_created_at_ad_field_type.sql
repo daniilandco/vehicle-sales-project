@@ -1,2 +1,2 @@
-alter table Ad
-  modify created_at DATE;
+ALTER TABLE Ad
+  MODIFY created_at DATE;

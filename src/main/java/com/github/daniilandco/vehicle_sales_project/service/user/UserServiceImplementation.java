@@ -4,10 +4,9 @@ import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequ
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
 import com.github.daniilandco.vehicle_sales_project.dto.mapper.UserMapper;
 import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
-import com.github.daniilandco.vehicle_sales_project.exception.EmailAlreadyExistsException;
-import com.github.daniilandco.vehicle_sales_project.exception.InvalidImageSizeException;
-import com.github.daniilandco.vehicle_sales_project.exception.PhoneNumberAlreadyExistsException;
-import com.github.daniilandco.vehicle_sales_project.exception.UserIsNotLoggedInException;
+import com.github.daniilandco.vehicle_sales_project.exception.*;
+import com.github.daniilandco.vehicle_sales_project.model.user.Role;
+import com.github.daniilandco.vehicle_sales_project.model.user.Status;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
 import com.github.daniilandco.vehicle_sales_project.security.AuthContextHandler;
@@ -17,6 +16,7 @@ import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -69,11 +69,10 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public UserDto getUserById(Long id) {
-        UserDto userDto = userMapper.toUserDto(Objects.requireNonNull(StreamSupport.stream(userRepository.findAll().spliterator(), false).
+        return userMapper.toUserDto(Objects.requireNonNull(StreamSupport.stream(userRepository.findAll().spliterator(), false).
                 filter(user -> user.getId().equals(id))
                 .findFirst()
                 .orElse(null)));
-        return userDto;
     }
 
     @Override
@@ -82,27 +81,41 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public String login(LoginRequest request) {
+    public String login(LoginRequest request) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("user doesn't exists"));
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getId().toString(), request.getPassword()));
 
         user.setLastLogin(new Timestamp(System.currentTimeMillis()));
         userRepository.save(user);
 
-        String token = jwtTokenProvider.createToken(user.getId());
-        return token;
+        return jwtTokenProvider.createToken(user.getId());
     }
 
     @Override
-    public void register(RegisterRequest request) throws EmailAlreadyExistsException, PhoneNumberAlreadyExistsException {
+    public UserDto register(RegisterRequest request) throws EmailAlreadyExistsException, PhoneNumberAlreadyExistsException, RegistrationException {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new EmailAlreadyExistsException();
-        }
-        if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-            throw new PhoneNumberAlreadyExistsException();
+            throw new EmailAlreadyExistsException("invalid registration request: email already exists");
         }
 
-        userRepository.save(getUserFromRegisterRequest(request));
+        if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new PhoneNumberAlreadyExistsException("invalid registration request: phone number already exists");
+        }
+
+        if (!EnumUtils.isValidEnum(Status.class, request.getStatus())) {
+            throw new RegistrationException("invalid registration request: status field is invalid");
+        }
+
+        if (!EnumUtils.isValidEnum(Role.class, request.getRole())) {
+            throw new RegistrationException("invalid registration request: role field is invalid");
+        }
+
+        if (request.getPhoneNumber() == null) {
+            throw new RegistrationException("invalid registration request: phone number field is invalid");
+        }
+
+        User newUser = getUserFromRegisterRequest(request);
+        userRepository.save(newUser);
+        return userMapper.toUserDto(newUser);
     }
 
     public User getUserFromRegisterRequest(RegisterRequest request) {
@@ -110,7 +123,8 @@ public class UserServiceImplementation implements UserService {
                 request.getFirstName(), request.getSecondName(),
                 request.getEmail(), request.getPhoneNumber(),
                 passwordEncoder.encode(request.getPassword()),
-                request.getStatus(), request.getRole()
+                Status.valueOf(request.getStatus()),
+                Role.valueOf(request.getRole())
         );
     }
 

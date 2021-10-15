@@ -25,10 +25,7 @@ public class GoogleStorageSignedUrlGenerator {
         // Define resource
         BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, objectName)).build();
 
-        URL url =
-                storage.signUrl(blobInfo, 24, TimeUnit.HOURS, Storage.SignUrlOption.withV4Signature());
-
-        return url;
+        return storage.signUrl(blobInfo, 24, TimeUnit.HOURS, Storage.SignUrlOption.withV4Signature());
     }
 
 }

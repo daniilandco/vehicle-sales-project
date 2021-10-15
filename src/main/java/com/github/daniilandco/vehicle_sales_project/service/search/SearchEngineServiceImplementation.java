@@ -6,6 +6,7 @@ import com.github.daniilandco.vehicle_sales_project.dto.model.ad.AdDto;
 import com.github.daniilandco.vehicle_sales_project.exception.AdNotFoundException;
 import com.github.daniilandco.vehicle_sales_project.exception.CategoryException;
 import com.github.daniilandco.vehicle_sales_project.model.ad.Indices;
+import com.github.daniilandco.vehicle_sales_project.model.ad.Status;
 import com.github.daniilandco.vehicle_sales_project.model.category.Category;
 import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
 import com.github.daniilandco.vehicle_sales_project.service.category.CategoryService;
@@ -90,13 +91,16 @@ public class SearchEngineServiceImplementation implements SearchEngineService {
             queryBuilder.field(field);
         }
 
-        return queryBuilder;
+        return QueryBuilders.boolQuery()
+                .must(queryBuilder)
+                .must(QueryBuilders.matchQuery("status", Status.ACTIVE.toString()));
     }
 
     public static QueryBuilder getQueryBuilder(final SearchByParamsRequest request) {
         return QueryBuilders.boolQuery()
                 .must(QueryBuilders.rangeQuery("price").from(request.getPriceFrom()).to(request.getPriceTo()))
-                .must(QueryBuilders.rangeQuery("releaseYear").from(request.getReleaseYearFrom()).to(request.getReleaseYearTo()));
+                .must(QueryBuilders.rangeQuery("releaseYear").from(request.getReleaseYearFrom()).to(request.getReleaseYearTo()))
+                .must(QueryBuilders.matchQuery("status", Status.ACTIVE.toString()));
     }
 
     @Override

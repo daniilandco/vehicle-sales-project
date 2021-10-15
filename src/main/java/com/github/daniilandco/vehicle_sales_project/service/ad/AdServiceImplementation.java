@@ -17,7 +17,6 @@ import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +30,7 @@ import java.util.stream.StreamSupport;
 public class AdServiceImplementation implements AdService {
     private final UserRepository userRepository;
     private final AdRepository adRepository;
-    @Autowired
-    private AdElasticSearchRepository adElasticSearchRepository;
+    private final AdElasticSearchRepository adElasticSearchRepository;
     private final Storage storage;
     private final AdMapper adMapper;
     private final GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator;
@@ -47,7 +45,7 @@ public class AdServiceImplementation implements AdService {
     @Value("${cloud.subdirectory.ad}")
     private String adPhotosPath;
 
-    public AdServiceImplementation(UserRepository userRepository, AdRepository adRepository, Storage storage, AdMapper adMapper, GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator, AuthContextHandler authContextHandler, CategoryService categoryService, ImageService imageService) {
+    public AdServiceImplementation(UserRepository userRepository, AdRepository adRepository, Storage storage, AdMapper adMapper, GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator, AuthContextHandler authContextHandler, CategoryService categoryService, ImageService imageService, AdElasticSearchRepository adElasticSearchRepository) {
         this.userRepository = userRepository;
         this.adRepository = adRepository;
         this.storage = storage;
@@ -56,6 +54,7 @@ public class AdServiceImplementation implements AdService {
         this.authContextHandler = authContextHandler;
         this.categoryService = categoryService;
         this.imageService = imageService;
+        this.adElasticSearchRepository = adElasticSearchRepository;
     }
 
     @Override
@@ -65,8 +64,7 @@ public class AdServiceImplementation implements AdService {
 
     @Override
     public AdDto getAdById(Long id) throws AdNotFoundException {
-        AdDto adDto = adMapper.toAdDto(getAdModelById(id));
-        return adDto;
+        return adMapper.toAdDto(getAdModelById(id));
     }
 
     @Override
@@ -88,8 +86,7 @@ public class AdServiceImplementation implements AdService {
     @Override
     public Iterable<AdDto> getUserAds() throws UserIsNotLoggedInException {
         User user = authContextHandler.getLoggedInUser();
-        Iterable<AdDto> adDtoSet = adMapper.toAdDtoSet(user.getAds());
-        return adDtoSet;
+        return adMapper.toAdDtoSet(user.getAds());
     }
 
     @Override
@@ -120,7 +117,7 @@ public class AdServiceImplementation implements AdService {
     public void deleteUserAdById(Long id) throws AdNotFoundException, UserIsNotLoggedInException, AdDoesNotBelongToLoggedInUserException {
         User user = authContextHandler.getLoggedInUser();
         if (adRepository.existsById(id) && user.getAds().contains(getAdModelById(id))) {
-            user.getAds().remove(user.getAds().stream().filter(ad -> ad.getId().equals(id)).findFirst().orElseThrow(() -> new AdDoesNotBelongToLoggedInUserException()));
+            user.getAds().remove(user.getAds().stream().filter(ad -> ad.getId().equals(id)).findFirst().orElseThrow(AdDoesNotBelongToLoggedInUserException::new));
             userRepository.save(user);
 
             adRepository.deleteById(id);
@@ -142,11 +139,10 @@ public class AdServiceImplementation implements AdService {
 
     @Override
     public AdDto getUserAdById(Long id) throws AdNotFoundException {
-        AdDto adDto = adMapper.toAdDto(Objects.requireNonNull(StreamSupport.stream(adRepository.findAll().spliterator(), false).
+        return adMapper.toAdDto(Objects.requireNonNull(StreamSupport.stream(adRepository.findAll().spliterator(), false).
                 filter(user -> user.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new AdNotFoundException("ad doesn't exist or belong to logged in user"))));
-        return adDto;
     }
 
     @Override
@@ -168,9 +164,8 @@ public class AdServiceImplementation implements AdService {
     @Override
     public URL getAdPhotoById(Long adId, int photoId) throws AdDoesNotBelongToLoggedInUserException, UserIsNotLoggedInException, AdNotFoundException { // main ad photo name is '0.png'
         User user = authContextHandler.getLoggedInUser();
-        if (user.getAds().contains(adRepository.findById(adId).orElseThrow(() -> new AdDoesNotBelongToLoggedInUserException()))) {
-            URL url = googleStorageSignedUrlGenerator.generate(bucketName, getUniqueAdPhotoPath(adId, photoId));
-            return url;
+        if (user.getAds().contains(adRepository.findById(adId).orElseThrow(AdDoesNotBelongToLoggedInUserException::new))) {
+            return googleStorageSignedUrlGenerator.generate(bucketName, getUniqueAdPhotoPath(adId, photoId));
         } else {
             throw new AdNotFoundException();
         }

@@ -5,8 +5,10 @@ import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterR
 import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
 import com.github.daniilandco.vehicle_sales_project.exception.EmailAlreadyExistsException;
 import com.github.daniilandco.vehicle_sales_project.exception.PhoneNumberAlreadyExistsException;
+import com.github.daniilandco.vehicle_sales_project.exception.RegistrationException;
 import com.github.daniilandco.vehicle_sales_project.service.user.UserServiceImplementation;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,11 +27,16 @@ public class AuthenticationController {
         this.userService = userService;
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        String token = userService.login(request);
-        return ResponseEntity.ok(new RestApiResponse("user is logged in", token));
+        try {
+            String token = userService.login(request);
+            return ResponseEntity.ok(new RestApiResponse("user is logged in", token));
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new RestApiResponse(e.getMessage()));
+        }
     }
 
     @PostMapping("/logout")
@@ -41,9 +48,8 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
-            userService.register(request);
-            return ResponseEntity.ok(new RestApiResponse("user is registered"));
-        } catch (EmailAlreadyExistsException | PhoneNumberAlreadyExistsException e) {
+            return ResponseEntity.ok(new RestApiResponse("user is registered", userService.register(request)));
+        } catch (EmailAlreadyExistsException | PhoneNumberAlreadyExistsException | RegistrationException e) {
             return ResponseEntity
                     .badRequest()
                     .body(new RestApiResponse(e.getMessage()));

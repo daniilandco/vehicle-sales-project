@@ -72,7 +72,7 @@ public class Ad {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    @org.springframework.data.annotation.Transient
+    @Field(type = FieldType.Keyword)
     private Status status;
 
     @OneToMany(mappedBy = "ad", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -52,4 +52,3 @@ create TABLE `Category`
                          category (`id`)
               )
               engine=innodb;
-

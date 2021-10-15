@@ -1,6 +1,6 @@
-insert into CATEGORY
+INSERT INTO Category
   (id, category_name )
-    values
+    VALUES
       (1, 'cars'),
       (2, 'trucks'),
       (3, 'buses'),
@@ -10,7 +10,7 @@ insert into CATEGORY
       (7, 'trailers and semi-trailers'),
       (8, 'water transport');
 
-insert into CATEGORY
+INSERT INTO Category
   (id, category_name, parent_id)
     values
       (9, 'audi', 1),
