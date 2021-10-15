@@ -127,5 +127,4 @@ public class SearchEngineServiceImplementation implements SearchEngineService {
         }
         return ads;
     }
-
 }

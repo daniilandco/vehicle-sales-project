@@ -15,12 +15,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final int ENCRYPTION_STRENGTH = 12;
 
     private final JwtConfigurer jwtConfigurer;
 
-    public SecurityConfig(JwtConfigurer jwtConfigurer) {
+    public SecurityConfiguration(JwtConfigurer jwtConfigurer) {
         this.jwtConfigurer = jwtConfigurer;
     }
 
