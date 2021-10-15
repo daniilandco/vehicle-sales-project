@@ -13,9 +13,7 @@ public class AdMapper {
     public Iterable<AdDto> toAdDtoSet(Iterable<Ad> adSet) {
         if (adSet != null) {
             Set<AdDto> adDtoSet = new HashSet<>();
-            for (Ad ad : adSet) {
-                adDtoSet.add(toAdDto(ad));
-            }
+            adSet.forEach(ad -> adDtoSet.add(toAdDto(ad)));
             return adDtoSet;
         }
         return null;
