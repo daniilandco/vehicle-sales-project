@@ -63,7 +63,7 @@ public class AdServiceImplementation implements AdService {
 
     @Override
     public Iterable<AdDto> getAllAds() {
-        return adMapper.toAdDtoSet(adRepository.findAll());
+        return adMapper.toAdDtoList(adRepository.findAll());
     }
 
     @Override
@@ -90,7 +90,7 @@ public class AdServiceImplementation implements AdService {
     @Override
     public Iterable<AdDto> getUserAds() throws UserIsNotLoggedInException {
         User user = authContextHandler.getLoggedInUser();
-        return adMapper.toAdDtoSet(user.getAds());
+        return adMapper.toAdDtoList(user.getAds());
     }
 
     @Override

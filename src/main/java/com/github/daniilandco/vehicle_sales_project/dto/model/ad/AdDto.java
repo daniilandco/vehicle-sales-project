@@ -26,7 +26,6 @@ import java.sql.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AdDto {
     private Long id;
-    //private UserDto owner;
     @JsonManagedReference
     private Category category;
     private String title;

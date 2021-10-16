@@ -26,8 +26,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -68,7 +71,7 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public Iterable<UserDto> getAllUsers() {
-        return userMapper.toUserDtoSet(userRepository.findAll());
+        return userMapper.toUserDtoList(userRepository.findAll());
     }
 
     @Override
@@ -93,6 +96,13 @@ public class UserServiceImplementation implements UserService {
         userRepository.save(user);
 
         return jwtTokenProvider.createToken(user.getId());
+    }
+
+    @Override
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        jwtTokenProvider.invalidateToken(request);
+        SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
+        securityContextLogoutHandler.logout(request, response, null);
     }
 
     @Override
@@ -123,13 +133,16 @@ public class UserServiceImplementation implements UserService {
     }
 
     public User getUserFromRegisterRequest(RegisterRequest request) {
-        return new User(
-                request.getFirstName(), request.getSecondName(),
-                request.getEmail(), request.getPhoneNumber(),
-                passwordEncoder.encode(request.getPassword()),
-                Status.valueOf(request.getStatus()),
-                Role.valueOf(request.getRole())
-        );
+        return new User()
+                .setFirstName(request.getFirstName())
+                .setSecondName(request.getSecondName())
+                .setEmail(request.getEmail())
+                .setPhoneNumber(request.getPhoneNumber())
+                .setPassword(passwordEncoder.encode(request.getPassword()))
+                .setLocation(request.getLocation())
+                .setStatus(Status.valueOf(request.getStatus()))
+                .setRole(Role.valueOf(request.getRole()))
+                .setProfilePhoto(request.getProfilePhoto());
     }
 
     @Override
