@@ -4,8 +4,8 @@ import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class UserMapper {
@@ -16,16 +16,15 @@ public class UserMapper {
         this.adMapper = adMapper;
     }
 
-    public Iterable<UserDto> toUserDtoSet(Iterable<User> userSet) {
-        Collection<UserDto> userDtoSet = new HashSet<>();
-        for (User user : userSet) {
-            userDtoSet.add(toUserDto(user));
-        }
-        return userDtoSet;
+    public Iterable<UserDto> toUserDtoList(Iterable<User> userList) {
+        List<UserDto> userDtoList = new ArrayList<>();
+        userList.forEach(user -> userDtoList.add(toUserDto(user)));
+        return userDtoList;
     }
 
     public UserDto toUserDto(User user) {
         return new UserDto()
+                .setId(user.getId())
                 .setEmail(user.getEmail())
                 .setFirstName(user.getFirstName())
                 .setSecondName(user.getSecondName())
@@ -35,6 +34,6 @@ public class UserMapper {
                 .setRegisteredAt(user.getRegisteredAt())
                 .setStatus(user.getStatus())
                 .setRole(user.getRole())
-                .setAds(adMapper.toAdDtoSet(user.getAds()));
+                .setAds(adMapper.toAdDtoList(user.getAds()));
     }
 }

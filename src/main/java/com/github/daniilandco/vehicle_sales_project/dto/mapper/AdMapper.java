@@ -4,19 +4,16 @@ import com.github.daniilandco.vehicle_sales_project.dto.model.ad.AdDto;
 import com.github.daniilandco.vehicle_sales_project.model.ad.Ad;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class AdMapper {
 
-    public Iterable<AdDto> toAdDtoSet(Iterable<Ad> adSet) {
-        if (adSet != null) {
-            Set<AdDto> adDtoSet = new HashSet<>();
-            adSet.forEach(ad -> adDtoSet.add(toAdDto(ad)));
-            return adDtoSet;
-        }
-        return null;
+    public List<AdDto> toAdDtoList(Iterable<Ad> adList) {
+        List<AdDto> adDtoList = new ArrayList<>();
+        adList.forEach(ad -> adDtoList.add(toAdDto(ad)));
+        return adDtoList;
     }
 
     public AdDto toAdDto(Ad ad) {
