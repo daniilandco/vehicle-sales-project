@@ -17,8 +17,7 @@ public class GoogleStorageSignedUrlGenerator {
         this.storage = storage;
     }
 
-    public URL generate(
-            String bucketName, String objectName) throws StorageException {
+    public URL generate(String bucketName, String objectName) throws StorageException {
         // String bucketName = "my-bucket";
         // String objectName = "my-object";
 

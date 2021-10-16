@@ -9,7 +9,6 @@ import com.github.daniilandco.vehicle_sales_project.exception.auth.RegistrationE
 import com.github.daniilandco.vehicle_sales_project.service.user.UserServiceImplementation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,8 +40,7 @@ public class AuthenticationController {
 
     @PostMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-        SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
-        securityContextLogoutHandler.logout(request, response, null);
+        userService.logout(request, response);
     }
 
     @PostMapping("/register")

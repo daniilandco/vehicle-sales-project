@@ -80,7 +80,7 @@ public class AdController {
     @PostMapping("/new")
     public ResponseEntity<?> newAd(@RequestBody NewAdRequest request) {
         try {
-            return ResponseEntity.ok(new RestApiResponse("ok", adService.newAd(request)));
+            return ResponseEntity.ok(new RestApiResponse("new ad has been registered", adService.newAd(request)));
         } catch (CategoryException | UserIsNotLoggedInException e) {
             return ResponseEntity
                     .badRequest()

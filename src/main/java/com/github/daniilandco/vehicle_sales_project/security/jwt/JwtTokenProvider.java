@@ -1,5 +1,6 @@
 package com.github.daniilandco.vehicle_sales_project.security.jwt;
 
+import com.github.daniilandco.vehicle_sales_project.exception.auth.JwtAuthenticationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -15,8 +16,10 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtTokenProvider {
@@ -28,6 +31,8 @@ public class JwtTokenProvider {
     private String authorizationHeader;
     @Value("${jwt.expiration}")
     private long validityInSeconds;
+
+    private final List<String> tokenBlackList = new ArrayList<>();
 
     public JwtTokenProvider(@Qualifier("userDetailsServiceImplementation") UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
@@ -52,7 +57,10 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token) throws JwtAuthenticationException {
+        if (tokenBlackList.contains(token)) {
+            return false;
+        }
         Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(token);
         return !claimsJws.getBody().getExpiration().before(new Date());
     }
@@ -68,5 +76,9 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest request) {
         return request.getHeader(authorizationHeader);
+    }
+
+    public void invalidateToken(HttpServletRequest request) {
+        tokenBlackList.add(resolveToken(request));
     }
 }
