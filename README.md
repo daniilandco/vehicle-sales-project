@@ -7,11 +7,13 @@ Daniel Bondarkov, 2021
 
 #### Content of the project
 
-1. [Common information](#common-info)
+* [Common information](#common-info)
 
-2. [Technical information](#tech-info)
+* [Technical information](#tech-info)
 
-3. [Ideas or features](#features)
+* [Ideas or features](#features)
+
+[**Front-end part of the project**](frontend/README.md)
 
 ***
 
@@ -19,9 +21,9 @@ Daniel Bondarkov, 2021
 
 ##### Common information about the project
 
-* The project is for internship in the ItechArt company.  
+* The project is for internship in the ItechArt company.
 
-* A web service for vehicles sales.  
+* A web service for vehicles sales.
 
 * Project managment is implemented using Trello service.
 
@@ -33,8 +35,7 @@ Daniel Bondarkov, 2021
 
 > Note: More detailed description of what opportunities are given to users of the service is [below](#features).
 
-
-***
+___
 
 <a id="tech-info"></a>
 
