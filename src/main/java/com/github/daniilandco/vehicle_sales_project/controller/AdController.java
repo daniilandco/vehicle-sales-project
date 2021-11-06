@@ -1,5 +1,6 @@
 package com.github.daniilandco.vehicle_sales_project.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByParamsRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByQueryRequest;
@@ -9,6 +10,7 @@ import com.github.daniilandco.vehicle_sales_project.exception.ad.AdNotFoundExcep
 import com.github.daniilandco.vehicle_sales_project.exception.auth.JwtAuthenticationException;
 import com.github.daniilandco.vehicle_sales_project.exception.auth.UserIsNotLoggedInException;
 import com.github.daniilandco.vehicle_sales_project.exception.category.CategoryException;
+import com.github.daniilandco.vehicle_sales_project.exception.image.AdPhotoNotFoundException;
 import com.github.daniilandco.vehicle_sales_project.exception.image.InvalidImageSizeException;
 import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
 import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/ad")
@@ -67,8 +70,11 @@ public class AdController {
     }
 
     @GetMapping("/search/query")
-    public ResponseEntity<?> search(@RequestBody SearchByQueryRequest request) {
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<?> search(@RequestParam("request") String encodedRequest) {
         try {
+            final SearchByQueryRequest request =
+                    new ObjectMapper().readValue(Base64.getDecoder().decode(encodedRequest), SearchByQueryRequest.class);
             return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.search(request)));
         } catch (IOException | AdNotFoundException e) {
             return ResponseEntity
@@ -102,10 +108,11 @@ public class AdController {
 
 
     @GetMapping("/{id}/main_photo")
+    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<?> getMainAdPhoto(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(new RestApiResponse("ok", adService.getAdPhotoById(id, 0)));
-        } catch (AdNotFoundException | UserIsNotLoggedInException | AdDoesNotBelongToLoggedInUserException e) {
+        } catch (AdPhotoNotFoundException e) {
             return ResponseEntity
                     .badRequest()
                     .body((new RestApiResponse(e.getMessage())));

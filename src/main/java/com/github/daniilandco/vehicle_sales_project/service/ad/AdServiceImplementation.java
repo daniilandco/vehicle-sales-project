@@ -7,12 +7,14 @@ import com.github.daniilandco.vehicle_sales_project.exception.ad.AdDoesNotBelong
 import com.github.daniilandco.vehicle_sales_project.exception.ad.AdNotFoundException;
 import com.github.daniilandco.vehicle_sales_project.exception.auth.UserIsNotLoggedInException;
 import com.github.daniilandco.vehicle_sales_project.exception.category.CategoryException;
+import com.github.daniilandco.vehicle_sales_project.exception.image.AdPhotoNotFoundException;
 import com.github.daniilandco.vehicle_sales_project.exception.image.InvalidImageSizeException;
 import com.github.daniilandco.vehicle_sales_project.model.ad.Ad;
 import com.github.daniilandco.vehicle_sales_project.model.photos.AdPhoto;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
 import com.github.daniilandco.vehicle_sales_project.repository.ad.AdElasticSearchRepository;
 import com.github.daniilandco.vehicle_sales_project.repository.ad.AdRepository;
+import com.github.daniilandco.vehicle_sales_project.repository.photos.AdPhotoRepository;
 import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
 import com.github.daniilandco.vehicle_sales_project.security.AuthContextHandler;
 import com.github.daniilandco.vehicle_sales_project.service.category.CategoryService;
@@ -34,6 +36,7 @@ import java.util.stream.StreamSupport;
 public class AdServiceImplementation implements AdService {
     private final UserRepository userRepository;
     private final AdRepository adRepository;
+    private final AdPhotoRepository adPhotoRepository;
     private final AdElasticSearchRepository adElasticSearchRepository;
     private final Storage storage;
     private final AdMapper adMapper;
@@ -49,7 +52,7 @@ public class AdServiceImplementation implements AdService {
     @Value("${cloud.subdirectory.ad}")
     private String adPhotosPath;
 
-    public AdServiceImplementation(UserRepository userRepository, AdRepository adRepository, Storage storage, AdMapper adMapper, GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator, AuthContextHandler authContextHandler, CategoryService categoryService, ImageService imageService, AdElasticSearchRepository adElasticSearchRepository) {
+    public AdServiceImplementation(UserRepository userRepository, AdRepository adRepository, Storage storage, AdMapper adMapper, GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator, AuthContextHandler authContextHandler, CategoryService categoryService, ImageService imageService, AdElasticSearchRepository adElasticSearchRepository, AdPhotoRepository adPhotoRepository) {
         this.userRepository = userRepository;
         this.adRepository = adRepository;
         this.storage = storage;
@@ -59,6 +62,7 @@ public class AdServiceImplementation implements AdService {
         this.categoryService = categoryService;
         this.imageService = imageService;
         this.adElasticSearchRepository = adElasticSearchRepository;
+        this.adPhotoRepository = adPhotoRepository;
     }
 
     @Override
@@ -166,16 +170,15 @@ public class AdServiceImplementation implements AdService {
     }
 
     @Override
-    public URL getAdPhotoById(Long adId, int photoId) throws AdDoesNotBelongToLoggedInUserException, UserIsNotLoggedInException, AdNotFoundException { // main ad photo name is '0.png'
-        User user = authContextHandler.getLoggedInUser();
-        if (user.getAds().contains(adRepository.findById(adId).orElseThrow(AdDoesNotBelongToLoggedInUserException::new))) {
+    public URL getAdPhotoById(Long adId, int photoId) throws AdPhotoNotFoundException { // main ad photo name is '0.png'
+        if (adPhotoRepository.existsByAd(adId)) {
             return googleStorageSignedUrlGenerator.generate(bucketName, getUniqueAdPhotoPath(adId, photoId));
         } else {
-            throw new AdNotFoundException();
+            throw new AdPhotoNotFoundException("no photos belong to an ad");
         }
     }
 
     private String getUniqueAdPhotoPath(Long id, int counter) {
-        return adPhotosPath + id + "/" + counter + "." + defaultFormat;
+        return "%s%d/%d.%s".formatted(adPhotosPath, id, counter, defaultFormat);
     }
 }

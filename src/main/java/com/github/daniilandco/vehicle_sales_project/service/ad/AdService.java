@@ -7,6 +7,7 @@ import com.github.daniilandco.vehicle_sales_project.exception.ad.AdNotFoundExcep
 import com.github.daniilandco.vehicle_sales_project.exception.auth.JwtAuthenticationException;
 import com.github.daniilandco.vehicle_sales_project.exception.auth.UserIsNotLoggedInException;
 import com.github.daniilandco.vehicle_sales_project.exception.category.CategoryException;
+import com.github.daniilandco.vehicle_sales_project.exception.image.AdPhotoNotFoundException;
 import com.github.daniilandco.vehicle_sales_project.exception.image.InvalidImageSizeException;
 import com.github.daniilandco.vehicle_sales_project.model.ad.Ad;
 
@@ -36,5 +37,5 @@ public interface AdService {
 
     void uploadAdPhotos(Long id, byte[][] images) throws UserIsNotLoggedInException, AdNotFoundException, IOException, InvalidImageSizeException;
 
-    URL getAdPhotoById(Long adId, int photoId) throws AdDoesNotBelongToLoggedInUserException, UserIsNotLoggedInException, AdNotFoundException;
+    URL getAdPhotoById(Long adId, int photoId) throws AdPhotoNotFoundException;
 }
