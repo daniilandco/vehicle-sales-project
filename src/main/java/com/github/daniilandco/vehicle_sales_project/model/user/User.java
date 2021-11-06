@@ -70,6 +70,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Ad> ads;
 
+    @Column(name = "activation_code")
+    private String activationCode;
+
     public User() {
         this.ads = new ArrayList<>();
     }

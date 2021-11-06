@@ -47,4 +47,5 @@ public interface UserService {
 
     URL getProfilePhoto() throws IOException, JwtAuthenticationException, UserIsNotLoggedInException;
 
+    boolean activateUser(String code);
 }

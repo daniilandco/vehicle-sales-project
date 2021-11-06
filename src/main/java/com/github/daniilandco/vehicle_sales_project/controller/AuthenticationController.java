@@ -9,10 +9,7 @@ import com.github.daniilandco.vehicle_sales_project.exception.auth.RegistrationE
 import com.github.daniilandco.vehicle_sales_project.service.user.UserServiceImplementation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,5 +49,14 @@ public class AuthenticationController {
                     .badRequest()
                     .body(new RestApiResponse(e.getMessage()));
         }
+    }
+
+    @GetMapping("/activate/{code}")
+    public ResponseEntity<?> activate(@PathVariable String code) {
+        boolean isActivated = userService.activateUser(code);
+        return isActivated ? ResponseEntity.ok(new RestApiResponse("successful activation")) :
+                ResponseEntity
+                        .badRequest()
+                        .body(new RestApiResponse("unsuccessful activation"));
     }
 }

@@ -133,6 +133,7 @@
             <artifactId>spring-cloud-gcp-starter-storage</artifactId>
         </dependency>
 
+        <!-- email sending service -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>

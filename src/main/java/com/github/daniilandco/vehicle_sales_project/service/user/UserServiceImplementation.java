@@ -17,10 +17,12 @@ import com.github.daniilandco.vehicle_sales_project.security.AuthContextHandler;
 import com.github.daniilandco.vehicle_sales_project.security.jwt.JwtTokenProvider;
 import com.github.daniilandco.vehicle_sales_project.service.gcs.GoogleStorageSignedUrlGenerator;
 import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
+import com.github.daniilandco.vehicle_sales_project.service.mail.MailService;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +37,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -48,6 +52,7 @@ public class UserServiceImplementation implements UserService {
     private final GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator;
     private final AuthContextHandler authContextHandler;
     private final ImageService imageService;
+    private final MailService mailService;
 
     @Value("${cloud.bucketname}")
     private String bucketName;
@@ -56,8 +61,10 @@ public class UserServiceImplementation implements UserService {
     @Value("${cloud.subdirectory.profile}")
     private String profilePhotosPath;
 
+    private final String ACTIVATED_ACCOUNT_CODE = "ACTIVATED";
 
-    public UserServiceImplementation(PasswordEncoder passwordEncoder, UserRepository userRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, Storage storage, UserMapper userMapper, GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator, AuthContextHandler authContextHandler, ImageService imageService) {
+
+    public UserServiceImplementation(PasswordEncoder passwordEncoder, UserRepository userRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, Storage storage, UserMapper userMapper, GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator, AuthContextHandler authContextHandler, ImageService imageService, MailService mailService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
@@ -67,6 +74,7 @@ public class UserServiceImplementation implements UserService {
         this.googleStorageSignedUrlGenerator = googleStorageSignedUrlGenerator;
         this.authContextHandler = authContextHandler;
         this.imageService = imageService;
+        this.mailService = mailService;
     }
 
     @Override
@@ -89,7 +97,8 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public String login(LoginRequest request) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("user doesn't exists"));
+        User user = userRepository.findByEmailAndActivationCode(request.getEmail(), ACTIVATED_ACCOUNT_CODE)
+                .orElseThrow(() -> new UsernameNotFoundException("user doesn't exists"));
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getId().toString(), request.getPassword()));
 
         user.setLastLogin(new Timestamp(System.currentTimeMillis()));
@@ -107,7 +116,7 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public UserDto register(RegisterRequest request) throws EmailAlreadyExistsException, PhoneNumberAlreadyExistsException, RegistrationException {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (StringUtils.isEmpty(request.getEmail()) || userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistsException("invalid registration request: email already exists");
         }
 
@@ -128,8 +137,30 @@ public class UserServiceImplementation implements UserService {
         }
 
         User newUser = getUserFromRegisterRequest(request);
+        newUser.setActivationCode(UUID.randomUUID().toString());
+
+        String message = String.format("Hello, %s!\n" +
+                        "Welcome to Vehicle Sales Service. For account activation, please visit the link:" +
+                        "http://localhost:8080/auth/activate/%s",
+                newUser.getFirstName(),
+                newUser.getActivationCode());
+
+        mailService.send(request.getEmail(), "Activation code", message);
+
         userRepository.save(newUser);
         return userMapper.toUserDto(newUser);
+    }
+
+    @Override
+    public boolean activateUser(String code) {
+        Optional<User> user = userRepository.findByActivationCode(code);
+        if (user.isEmpty()) {
+            return false;
+        }
+        User userModel = user.get();
+        userModel.setActivationCode(ACTIVATED_ACCOUNT_CODE);
+        userRepository.save(userModel);
+        return true;
     }
 
     public User getUserFromRegisterRequest(RegisterRequest request) {
