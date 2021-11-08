@@ -1,0 +1,59 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.ad {
+  overflow: hidden;
+  box-shadow: 0 2px 20px #e1e5ee;
+  border-radius: 0.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 200ms ease-in;
+}
+
+.ad:hover {
+  transform: scale(1.02);
+}
+
+.ad__body {
+  font-family: Oxygen, sans-serif;
+  margin: 1em 1em 0 1em;
+}
+
+.ad__title {
+  padding: 1rem;
+}
+
+.ad__description {
+  padding: 0 1rem;
+}
+
+.price {
+  color: grey;
+  font-size: 22px;
+  margin-left: 1em;
+}
+
+.ad__btn {
+  padding: 1rem;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 1rem;
+  margin: 1rem;
+  border: 2px solid #d50000;
+  background: transparent;
+  color: #d50000;
+  border-radius: 0.2rem;
+  transition: background 200ms ease-in, color 200ms ease-in;
+}
+
+.ad__btn:hover {
+  background: #d50000;
+  color: white;
+}

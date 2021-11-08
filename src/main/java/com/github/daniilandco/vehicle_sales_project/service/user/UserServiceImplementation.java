@@ -60,6 +60,8 @@ public class UserServiceImplementation implements UserService {
     private String defaultFormat;
     @Value("${cloud.subdirectory.profile}")
     private String profilePhotosPath;
+    @Value("${spring.server.hostname}")
+    private String hostname;
 
     private final String ACTIVATED_ACCOUNT_CODE = "ACTIVATED";
 
@@ -141,8 +143,9 @@ public class UserServiceImplementation implements UserService {
 
         String message = String.format("Hello, %s!\n" +
                         "Welcome to Vehicle Sales Service. For account activation, please visit the link:" +
-                        "http://localhost:8080/auth/activate/%s",
+                        "%s/auth/activate/%s",
                 newUser.getFirstName(),
+                hostname,
                 newUser.getActivationCode());
 
         mailService.send(request.getEmail(), "Activation code", message);

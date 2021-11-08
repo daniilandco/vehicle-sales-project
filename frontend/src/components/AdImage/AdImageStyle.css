@@ -1,0 +1,5 @@
+.ad__img {
+    height: 12rem;
+    width: 100%;
+    object-fit: cover;
+}
