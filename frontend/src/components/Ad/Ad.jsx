@@ -1,5 +1,5 @@
 import React from 'react';
-import './AdStyle.css';
+import './Ad.css';
 
 import AdImage from '../AdImage/AdImage';
 
