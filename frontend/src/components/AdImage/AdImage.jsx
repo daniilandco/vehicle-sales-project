@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import './AdImageStyle.css';
+import './AdImage.css';
 import placeholder from '../../assets/placeholder.png';
 import DataService from '../../services/DataService';
 import loader from '../../assets/loader.svg';
