@@ -24,6 +24,7 @@ import java.util.Base64;
 
 @RestController
 @RequestMapping("/ad")
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 public class AdController {
 
     private final AdService adService;
@@ -70,7 +71,6 @@ public class AdController {
     }
 
     @GetMapping("/search/query")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<?> search(@RequestParam("request") String encodedRequest) {
         try {
             final SearchByQueryRequest request =
@@ -108,7 +108,6 @@ public class AdController {
 
 
     @GetMapping("/{id}/main_photo")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<?> getMainAdPhoto(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(new RestApiResponse("ok", adService.getAdPhotoById(id, 0)));

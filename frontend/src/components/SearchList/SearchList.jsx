@@ -1,28 +1,17 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import './SearchListStyle.css';
 import Ad from '../Ad/Ad';
 import {useSearch} from '../../providers/SearchProvider';
+import loader from '../../assets/loader.svg';
 
 const SearchList = () => {
   const search = useSearch();
 
-  useEffect(() => {
-    async function fetchData() {
-      await search.onSearch();
-    }
-
-    fetchData();
-  }, [search.terms]);
-
-  useEffect(() => {
-    console.log('list rendered');
-  });
-
   return (
-      <div id="list">
-        {search.ads?.map((ad) => (
-            <Ad key={ad.id} ad={ad}/>
-        ))}
+      <div className="list">
+          {search.loading ? <img src={loader} alt="error"/> : search.ads?.map((ad) => (
+              <Ad key={ad.id} ad={ad}/>
+          ))}
       </div>
   );
 };

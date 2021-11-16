@@ -1,6 +1,5 @@
 package com.github.daniilandco.vehicle_sales_project.security.jwt;
 
-import com.github.daniilandco.vehicle_sales_project.exception.auth.JwtAuthenticationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -57,7 +56,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public boolean validateToken(String token) throws JwtAuthenticationException {
+    public boolean validateToken(String token) {
         if (tokenBlackList.contains(token)) {
             return false;
         }

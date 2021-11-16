@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './AdImage.css';
 import placeholder from '../../assets/placeholder.png';
-import DataService from '../../services/DataService';
+import AdService from '../../services/AdService';
 import loader from '../../assets/loader.svg';
 
 const AdImage = ({id}) => {
@@ -10,7 +10,7 @@ const AdImage = ({id}) => {
 
   useEffect(() => {
     async function fetchData() {
-      const src = await DataService.getMainAdPhoto(id);
+      const src = await AdService.fetchMainAdPhoto(id);
       setImage((await src) ? src : placeholder);
       setLoading(false);
     }

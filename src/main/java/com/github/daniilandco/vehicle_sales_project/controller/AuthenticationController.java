@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 public class AuthenticationController {
     private final UserServiceImplementation userService;
 
