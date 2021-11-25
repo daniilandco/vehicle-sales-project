@@ -89,12 +89,12 @@ public class User implements UserDetails {
 
     public UserDetails getUserDetails() {
         return new org.springframework.security.core.userdetails.User(
-                this.getId().toString(), this.getPassword(),
-                this.isActive(),
-                this.isActive(),
-                this.isActive(),
-                this.isActive(),
-                this.getRole().getAuthorities()
+                this.getUsername(), this.getPassword(),
+                this.isAccountNonExpired(),
+                this.isAccountNonLocked(),
+                this.isCredentialsNonExpired(),
+                this.isEnabled(),
+                this.getAuthorities()
         );
     }
 
@@ -109,12 +109,12 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return getId().toString();
+        return this.email;
     }
 
     @Override

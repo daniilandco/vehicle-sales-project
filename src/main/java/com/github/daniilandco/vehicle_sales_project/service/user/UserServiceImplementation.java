@@ -2,6 +2,7 @@ package com.github.daniilandco.vehicle_sales_project.service.user;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
+import com.github.daniilandco.vehicle_sales_project.controller.response.SuccessAuthResponse;
 import com.github.daniilandco.vehicle_sales_project.dto.mapper.UserMapper;
 import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
 import com.github.daniilandco.vehicle_sales_project.exception.auth.EmailAlreadyExistsException;
@@ -9,12 +10,15 @@ import com.github.daniilandco.vehicle_sales_project.exception.auth.PhoneNumberAl
 import com.github.daniilandco.vehicle_sales_project.exception.auth.RegistrationException;
 import com.github.daniilandco.vehicle_sales_project.exception.auth.UserIsNotLoggedInException;
 import com.github.daniilandco.vehicle_sales_project.exception.image.InvalidImageSizeException;
+import com.github.daniilandco.vehicle_sales_project.exception.token.InvalidTokenException;
 import com.github.daniilandco.vehicle_sales_project.model.user.Role;
 import com.github.daniilandco.vehicle_sales_project.model.user.Status;
 import com.github.daniilandco.vehicle_sales_project.model.user.User;
+import com.github.daniilandco.vehicle_sales_project.repository.token.TokenRepository;
 import com.github.daniilandco.vehicle_sales_project.repository.user.UserRepository;
 import com.github.daniilandco.vehicle_sales_project.security.AuthContextHandler;
 import com.github.daniilandco.vehicle_sales_project.security.jwt.JwtTokenProvider;
+import com.github.daniilandco.vehicle_sales_project.security.jwt.TokenResponse;
 import com.github.daniilandco.vehicle_sales_project.service.gcs.GoogleStorageSignedUrlGenerator;
 import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
 import com.github.daniilandco.vehicle_sales_project.service.mail.MailService;
@@ -33,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -53,6 +58,7 @@ public class UserServiceImplementation implements UserService {
     private final AuthContextHandler authContextHandler;
     private final ImageService imageService;
     private final MailService mailService;
+    private final TokenRepository tokenRepository;
 
     @Value("${cloud.bucketname}")
     private String bucketName;
@@ -66,7 +72,7 @@ public class UserServiceImplementation implements UserService {
     private final String ACTIVATED_ACCOUNT_CODE = "ACTIVATED";
 
 
-    public UserServiceImplementation(PasswordEncoder passwordEncoder, UserRepository userRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, Storage storage, UserMapper userMapper, GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator, AuthContextHandler authContextHandler, ImageService imageService, MailService mailService) {
+    public UserServiceImplementation(PasswordEncoder passwordEncoder, UserRepository userRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, Storage storage, UserMapper userMapper, GoogleStorageSignedUrlGenerator googleStorageSignedUrlGenerator, AuthContextHandler authContextHandler, ImageService imageService, MailService mailService, TokenRepository tokenRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
@@ -77,6 +83,7 @@ public class UserServiceImplementation implements UserService {
         this.authContextHandler = authContextHandler;
         this.imageService = imageService;
         this.mailService = mailService;
+        this.tokenRepository = tokenRepository;
     }
 
     @Override
@@ -98,26 +105,30 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public String login(LoginRequest request) throws UsernameNotFoundException {
+    public SuccessAuthResponse login(LoginRequest request) throws UsernameNotFoundException, UserIsNotLoggedInException {
         User user = userRepository.findByEmailAndActivationCode(request.getEmail(), ACTIVATED_ACCOUNT_CODE)
                 .orElseThrow(() -> new UsernameNotFoundException("user doesn't exists"));
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getId().toString(), request.getPassword()));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), request.getPassword()));
 
         user.setLastLogin(new Timestamp(System.currentTimeMillis()));
         userRepository.save(user);
 
-        return jwtTokenProvider.createToken(user.getId());
+        TokenResponse tokenResponse = jwtTokenProvider.createToken(user.getEmail());
+        jwtTokenProvider.saveToken(user.getId(), tokenResponse.getRefreshToken());
+
+        return new SuccessAuthResponse(userMapper.toUserDto(user), tokenResponse);
     }
 
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        jwtTokenProvider.invalidateToken(request);
+    @Transactional
+    public void logout(String refreshToken, HttpServletRequest request, HttpServletResponse response) {
         SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
         securityContextLogoutHandler.logout(request, response, null);
+        jwtTokenProvider.removeToken(refreshToken);
     }
 
     @Override
-    public UserDto register(RegisterRequest request) throws EmailAlreadyExistsException, PhoneNumberAlreadyExistsException, RegistrationException {
+    public SuccessAuthResponse register(RegisterRequest request) throws EmailAlreadyExistsException, PhoneNumberAlreadyExistsException, RegistrationException, UserIsNotLoggedInException {
         if (StringUtils.isEmpty(request.getEmail()) || userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistsException("invalid registration request: email already exists");
         }
@@ -151,7 +162,26 @@ public class UserServiceImplementation implements UserService {
         mailService.send(request.getEmail(), "Activation code", message);
 
         userRepository.save(newUser);
-        return userMapper.toUserDto(newUser);
+
+        TokenResponse tokenResponse = jwtTokenProvider.createToken(newUser.getEmail());
+        jwtTokenProvider.saveToken(newUser.getId(), tokenResponse.getRefreshToken());
+
+        return new SuccessAuthResponse(userMapper.toUserDto(newUser), tokenResponse);
+    }
+
+    public SuccessAuthResponse refresh(String refreshToken) throws UserIsNotLoggedInException, InvalidTokenException {
+        if (jwtTokenProvider.validateRefreshToken(refreshToken)
+                && tokenRepository.existsByRefreshToken(refreshToken)) {
+
+            User user = authContextHandler.getLoggedInUser();
+
+            TokenResponse tokenResponse = jwtTokenProvider.createToken(user.getEmail());
+            jwtTokenProvider.saveToken(user.getId(), tokenResponse.getRefreshToken());
+
+            return new SuccessAuthResponse(userMapper.toUserDto(user), tokenResponse);
+        } else {
+            throw new InvalidTokenException("refresh token is invalid");
+        }
     }
 
     @Override
@@ -188,9 +218,6 @@ public class UserServiceImplementation implements UserService {
         }
         if (request.getSecondName() != null) {
             userModel.setSecondName(request.getSecondName());
-        }
-        if (request.getEmail() != null) {
-            userModel.setEmail(request.getEmail());
         }
         if (request.getPhoneNumber() != null) {
             userModel.setPhoneNumber(request.getPhoneNumber());

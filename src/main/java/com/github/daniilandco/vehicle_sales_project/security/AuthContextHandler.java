@@ -17,8 +17,8 @@ public class AuthContextHandler {
     }
 
     public User getLoggedInUser() throws UserIsNotLoggedInException {
-        String id = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        Optional<User> user = userRepository.findById(Long.parseLong(id));
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
             throw new UserIsNotLoggedInException();
         } else {

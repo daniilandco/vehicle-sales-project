@@ -24,7 +24,6 @@ import java.util.Base64;
 
 @RestController
 @RequestMapping("/ad")
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 public class AdController {
 
     private final AdService adService;

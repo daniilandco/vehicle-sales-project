@@ -2,6 +2,7 @@ package com.github.daniilandco.vehicle_sales_project.service.user;
 
 import com.github.daniilandco.vehicle_sales_project.controller.request.LoginRequest;
 import com.github.daniilandco.vehicle_sales_project.controller.request.RegisterRequest;
+import com.github.daniilandco.vehicle_sales_project.controller.response.SuccessAuthResponse;
 import com.github.daniilandco.vehicle_sales_project.dto.model.user.UserDto;
 import com.github.daniilandco.vehicle_sales_project.exception.auth.*;
 import com.github.daniilandco.vehicle_sales_project.exception.image.InvalidImageSizeException;
@@ -17,8 +18,10 @@ import java.net.URL;
 public interface UserService {
     /**
      * Register a new user
+     *
+     * @return
      */
-    UserDto register(RegisterRequest request) throws JwtAuthenticationException, EmailAlreadyExistsException, PhoneNumberAlreadyExistsException, RegistrationException;
+    SuccessAuthResponse register(RegisterRequest request) throws JwtAuthenticationException, EmailAlreadyExistsException, PhoneNumberAlreadyExistsException, RegistrationException, UserIsNotLoggedInException;
 
     Iterable<UserDto> getAllUsers();
 
@@ -28,13 +31,15 @@ public interface UserService {
 
     /**
      * Login a user
+     *
+     * @return
      */
-    String login(LoginRequest request);
+    SuccessAuthResponse login(LoginRequest request) throws UserIsNotLoggedInException;
 
     /**
      * Login a user
      */
-    void logout(HttpServletRequest request, HttpServletResponse response);
+    void logout(String token, HttpServletRequest request, HttpServletResponse response);
 
     /**
      * Update profile of the user

@@ -33,7 +33,6 @@ public class UserMapper {
                 .setLastLogin(user.getLastLogin())
                 .setRegisteredAt(user.getRegisteredAt())
                 .setStatus(user.getStatus())
-                .setRole(user.getRole())
-                .setAds(adMapper.toAdDtoList(user.getAds()));
+                .setRole(user.getRole());
     }
 }

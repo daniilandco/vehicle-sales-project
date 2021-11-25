@@ -2,7 +2,6 @@ package com.github.daniilandco.vehicle_sales_project.dto.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.daniilandco.vehicle_sales_project.dto.model.ad.AdDto;
 import com.github.daniilandco.vehicle_sales_project.model.user.Role;
 import com.github.daniilandco.vehicle_sales_project.model.user.Status;
 import lombok.Getter;
@@ -32,5 +31,4 @@ public class UserDto {
     private Timestamp lastLogin;
     private Status status;
     private Role role;
-    private Iterable<AdDto> ads;
 }
