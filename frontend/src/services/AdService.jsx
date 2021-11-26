@@ -1,3 +1,5 @@
+import $api from "../http";
+
 export default class AdService {
   static async fetchAds(terms) {
     const request = {
@@ -5,14 +7,14 @@ export default class AdService {
       terms: terms,
       sortBy: 'createdAt',
     };
-    const response = await fetch(`/ad/search/query?request=${btoa(JSON.stringify(request))}`);
-    const body = await response.json();
+    const response = await $api.get(`/ad/search/query?request=${btoa(JSON.stringify(request))}`);
+    const body = await response.data;
     return await body.body;
   }
 
   static async fetchMainAdPhoto(id) {
-    const response = await fetch(`/ad/${id}/main_photo`);
-    const body = await response.json();
+    const response = await $api.get(`/ad/${id}/main_photo`);
+    const body = await response.data;
     return await body.body;
   }
 }

@@ -106,7 +106,6 @@ public class SearchEngineServiceImplementation implements SearchEngineService {
     @Override
     public Iterable<AdDto> search(SearchByQueryRequest request) throws IOException, AdNotFoundException {
         final SearchRequest searchRequest = buildSearchRequest(request);
-
         return getSearchResultsByRequest(searchRequest);
     }
 

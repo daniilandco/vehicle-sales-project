@@ -1,10 +1,9 @@
 import React from 'react';
-import NavBar from '../components/NavBar/NavBar';
 import {SearchProvider} from '../providers/SearchProvider';
 import Footer from '../components/Footer/Footer';
 import SearchBar from '../components/SearchBar/SearchBar';
 import SearchList from '../components/SearchList/SearchList';
-import LoginForm from "../modal/LoginForm";
+import NavBar from "../components/NavBar/NavBar";
 
 const Main = () => {
     return (
@@ -14,7 +13,6 @@ const Main = () => {
                 <SearchBar/>
                 <SearchList/>
             </SearchProvider>
-            <LoginForm/>
             <Footer/>
         </div>
     );

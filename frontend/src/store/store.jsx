@@ -20,8 +20,7 @@ class Store {
     async login(email, password) {
         try {
             const response = await AuthService.login(email, password);
-            console.log(response);
-            localStorage.setItem('token', response.data.body.token);
+            localStorage.setItem('token', response.data.body.token.accessToken);
             this.setAuth(true);
             this.setUser(response.data.body.user);
         } catch (e) {
@@ -29,8 +28,20 @@ class Store {
         }
     }
 
-    async register(firstName, secondName, email, password) {
-        await AuthService.register(firstName, secondName, email, password);
+    async register(firstName, secondName, email, phoneNumber, password) {
+        try {
+            const response = await AuthService.register(
+                firstName,
+                secondName,
+                email,
+                phoneNumber,
+                password,
+                'ACTIVE',
+                'USER'
+            );
+        } catch (e) {
+            console.log(e.response?.data?.message);
+        }
     }
 
     async logout() {
@@ -39,6 +50,14 @@ class Store {
             localStorage.removeItem('token');
             this.setAuth(false);
             this.setUser({});
+        } catch (e) {
+            console.log(e.response?.data?.message);
+        }
+    }
+
+    async checkAuth() {
+        try {
+
         } catch (e) {
             console.log(e.response?.data?.message);
         }

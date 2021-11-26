@@ -1,23 +1,22 @@
 import $api from "../http";
-import axios from "axios";
 
 class AuthService {
     static CRED_ITEM = 'user';
 
     static async login(email, password) {
-        const request = {
-            email: email,
-            password: password
-        };
-        return axios.create().post('http://localhost:8080/auth/login', JSON.stringify(request), {
-            headers: {
-                'content-type': 'application/json'
-            }
-        });
+        return $api.post('/auth/login', {email, password});
     }
 
-    static async register(firstName, secondName, email, password) {
-        return $api.post('/auth/register', {firstName, secondName, email, password});
+    static async register(firstName, secondName, email, phoneNumber, password, status, role) {
+        return $api.post('/auth/register', {
+            firstName,
+            secondName,
+            email,
+            phoneNumber,
+            password,
+            status,
+            role
+        });
     }
 
     static async logout() {

@@ -14,10 +14,6 @@
     border-right: none;
 }
 
-.input__form:focus {
-    outline: none;
-}
-
 .search-button {
     border-bottom-right-radius: 5px;
     border-top-right-radius: 5px;

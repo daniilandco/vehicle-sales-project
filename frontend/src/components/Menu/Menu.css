@@ -33,13 +33,13 @@
     margin-right: 2rem;
 }
 
-.nav-links {
+.nav-links, .nav-links-mobile {
     color: white;
     text-decoration: none;
     padding: 0.5rem 1rem;
 }
 
-.nav-links:hover {
+.nav-links:hover, .nav-links-mobile:hover {
     background-color: #af6087;
     border-radius: 4px;
     transition: all 0.2s ease-out;
@@ -51,10 +51,6 @@
 
 .fa-times {
     color: white;
-}
-
-.nav-links-mobile {
-    display: none;
 }
 
 .menu-icon {
@@ -139,7 +135,4 @@
         transition: 250ms;
     }
 
-    Button {
-        display: none;
-    }
 }
