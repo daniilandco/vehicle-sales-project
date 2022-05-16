@@ -13,7 +13,6 @@ import java.net.URI;
 
 @Configuration
 public class ElasticSearchConfiguration extends AbstractElasticsearchConfiguration {
-
     @Value("${elasticsearch.url}")
     private String elasticsearchUrl;
 

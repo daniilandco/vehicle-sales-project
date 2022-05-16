@@ -1,6 +1,4 @@
 import React, {useState} from 'react';
-import './NavBar.css';
-import {MenuItems} from "./MenuItems";
 import Button from "../Button/Button";
 
 const NavBar = () => {

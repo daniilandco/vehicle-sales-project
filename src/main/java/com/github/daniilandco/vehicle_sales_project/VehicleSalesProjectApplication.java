@@ -1,6 +1,6 @@
 package com.github.daniilandco.vehicle_sales_project;
 
-import com.github.daniilandco.vehicle_sales_project.repository.ad.AdElasticSearchRepository;
+import com.github.daniilandco.vehicle_sales_project.repository.AdElasticSearchRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;

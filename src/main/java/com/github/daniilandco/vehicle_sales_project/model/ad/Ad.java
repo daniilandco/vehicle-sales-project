@@ -76,7 +76,7 @@ public class Ad {
     private Status status;
 
     @OneToMany(mappedBy = "ad", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @org.springframework.data.annotation.Transient
+    @Transient
     private Set<AdPhoto> photos;
 
 
