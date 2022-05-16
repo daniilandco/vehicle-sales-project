@@ -1,10 +1,10 @@
 package com.github.daniilandco.vehicle_sales_project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.daniilandco.vehicle_sales_project.controller.request.NewAdRequest;
-import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByParamsRequest;
-import com.github.daniilandco.vehicle_sales_project.controller.request.SearchByQueryRequest;
-import com.github.daniilandco.vehicle_sales_project.controller.response.RestApiResponse;
+import com.github.daniilandco.vehicle_sales_project.dto.request.AdRequestDTO;
+import com.github.daniilandco.vehicle_sales_project.dto.request.SearchByParamsRequestDTO;
+import com.github.daniilandco.vehicle_sales_project.dto.request.SearchByQueryRequestDTO;
+import com.github.daniilandco.vehicle_sales_project.dto.response.RestApiResponse;
 import com.github.daniilandco.vehicle_sales_project.exception.ad.AdDoesNotBelongToLoggedInUserException;
 import com.github.daniilandco.vehicle_sales_project.exception.ad.AdNotFoundException;
 import com.github.daniilandco.vehicle_sales_project.exception.auth.JwtAuthenticationException;
@@ -12,9 +12,10 @@ import com.github.daniilandco.vehicle_sales_project.exception.auth.UserIsNotLogg
 import com.github.daniilandco.vehicle_sales_project.exception.category.CategoryException;
 import com.github.daniilandco.vehicle_sales_project.exception.image.AdPhotoNotFoundException;
 import com.github.daniilandco.vehicle_sales_project.exception.image.InvalidImageSizeException;
-import com.github.daniilandco.vehicle_sales_project.service.ad.AdService;
-import com.github.daniilandco.vehicle_sales_project.service.image.ImageService;
-import com.github.daniilandco.vehicle_sales_project.service.search.SearchEngineService;
+import com.github.daniilandco.vehicle_sales_project.service.AdService;
+import com.github.daniilandco.vehicle_sales_project.service.ImageService;
+import com.github.daniilandco.vehicle_sales_project.service.SearchEngineService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,17 +25,11 @@ import java.util.Base64;
 
 @RestController
 @RequestMapping("/ad")
+@AllArgsConstructor
 public class AdController {
-
     private final AdService adService;
     private final ImageService imageService;
     private final SearchEngineService searchEngineService;
-
-    public AdController(AdService adService, ImageService imageService, SearchEngineService searchEngineService) {
-        this.adService = adService;
-        this.imageService = imageService;
-        this.searchEngineService = searchEngineService;
-    }
 
     @GetMapping("/all")
     public ResponseEntity<?> getUserAds() {
@@ -59,7 +54,7 @@ public class AdController {
     }
 
     @GetMapping("/search/params")
-    public ResponseEntity<?> search(@RequestBody SearchByParamsRequest request) {
+    public ResponseEntity<?> search(@RequestBody SearchByParamsRequestDTO request) {
         try {
             return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.search(request)));
         } catch (IOException | AdNotFoundException | CategoryException e) {
@@ -70,75 +65,47 @@ public class AdController {
     }
 
     @GetMapping("/search/query")
-    public ResponseEntity<?> search(@RequestParam("request") String encodedRequest) {
-        try {
-            final SearchByQueryRequest request =
-                    new ObjectMapper().readValue(Base64.getDecoder().decode(encodedRequest), SearchByQueryRequest.class);
-            return ResponseEntity.ok(new RestApiResponse("ok", searchEngineService.search(request)));
-        } catch (IOException | AdNotFoundException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body((new RestApiResponse(e.getMessage())));
-        }
+    public ResponseEntity<?> search(@RequestParam("request") String encodedRequest) throws IOException, AdNotFoundException {
+        final SearchByQueryRequestDTO request =
+                new ObjectMapper().readValue(Base64.getDecoder().decode(encodedRequest), SearchByQueryRequestDTO.class);
+
+        return ResponseEntity.ok(new RestApiResponse("results of the search query", searchEngineService.search(request)));
     }
 
     @PostMapping("/new")
-    public ResponseEntity<?> newAd(@RequestBody NewAdRequest request) {
-        try {
-            return ResponseEntity.ok(new RestApiResponse("new ad has been registered", adService.newAd(request)));
-        } catch (CategoryException | UserIsNotLoggedInException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body((new RestApiResponse(e.getMessage())));
-        }
+    public ResponseEntity<?> newAd(@RequestBody AdRequestDTO request) throws CategoryException, UserIsNotLoggedInException {
+        return ResponseEntity.ok(new RestApiResponse(
+                "new ad with has been registered",
+                adService.newAd(request)));
     }
 
     @PostMapping("/{id}/upload_photos")
-    public ResponseEntity<?> uploadAdPhotos(@PathVariable Long id, @RequestParam("file") MultipartFile[] images) {
-        try {
-            adService.uploadAdPhotos(id, imageService.getBytesArrayFromMultipartFileArray(images));
-            return ResponseEntity.ok(new RestApiResponse("ad photos are updated"));
-        } catch (IOException | AdNotFoundException | UserIsNotLoggedInException | InvalidImageSizeException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body((new RestApiResponse(e.getMessage())));
-        }
+    public ResponseEntity<?> uploadAdPhotos(@PathVariable Long id, @RequestParam("file") MultipartFile[] images) throws IOException, InvalidImageSizeException, AdNotFoundException, UserIsNotLoggedInException {
+        adService.uploadAdPhotos(id, imageService.getBytesArrayFromMultipartFileArray(images));
+
+        return ResponseEntity.ok(new RestApiResponse("ad photos have been updated"));
     }
 
 
     @GetMapping("/{id}/main_photo")
-    public ResponseEntity<?> getMainAdPhoto(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(new RestApiResponse("ok", adService.getAdPhotoById(id, 0)));
-        } catch (AdPhotoNotFoundException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body((new RestApiResponse(e.getMessage())));
-        }
+    public ResponseEntity<?> getMainAdPhoto(@PathVariable Long id) throws AdPhotoNotFoundException {
+        return ResponseEntity.ok(new RestApiResponse(
+                "main photo of an ad with id=%d".formatted(id),
+                adService.getAdPhotoById(id, 0)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAd(@PathVariable Long id, @RequestBody NewAdRequest request) {
-        try {
-            adService.updateAd(id, request);
-            return ResponseEntity.ok(new RestApiResponse("Ad has been updated"));
-        } catch (CategoryException | AdNotFoundException | UserIsNotLoggedInException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new RestApiResponse(e.getMessage()));
-        }
+    public ResponseEntity<?> updateAd(@PathVariable Long id, @RequestBody AdRequestDTO request) throws CategoryException, AdNotFoundException, UserIsNotLoggedInException {
+        return ResponseEntity.ok(new RestApiResponse(
+                "an ad with id=%d has been updated".formatted(id),
+                adService.updateAd(id, request)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAdById(@PathVariable Long id) {
-        try {
-            adService.deleteUserAdById(id);
-            return ResponseEntity.ok(
-                    new RestApiResponse("ad is deleted"));
-        } catch (AdNotFoundException | UserIsNotLoggedInException | AdDoesNotBelongToLoggedInUserException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new RestApiResponse(e.getMessage()));
-        }
+    public ResponseEntity<?> deleteAdById(@PathVariable Long id) throws AdNotFoundException, UserIsNotLoggedInException, AdDoesNotBelongToLoggedInUserException {
+        adService.deleteUserAdById(id);
+
+        return ResponseEntity.ok(
+                new RestApiResponse("an ad with id=%d is deleted".formatted(id)));
     }
 }

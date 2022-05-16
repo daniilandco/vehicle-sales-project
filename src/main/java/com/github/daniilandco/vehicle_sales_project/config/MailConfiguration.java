@@ -10,7 +10,6 @@ import java.util.Properties;
 
 @Configuration
 public class MailConfiguration {
-
     @Value("${spring.mail.host}")
     private String host;
 

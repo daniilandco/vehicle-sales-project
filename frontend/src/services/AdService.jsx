@@ -5,7 +5,7 @@ export default class AdService {
     const request = {
       fields: ['title', 'description'],
       terms: terms,
-      sortBy: 'createdAt',
+      sort_by: 'createdAt',
     };
     const response = await $api.get(`/ad/search/query?request=${btoa(JSON.stringify(request))}`);
     const body = await response.data;
@@ -13,8 +13,13 @@ export default class AdService {
   }
 
   static async fetchMainAdPhoto(id) {
-    const response = await $api.get(`/ad/${id}/main_photo`);
-    const body = await response.data;
-    return await body.body;
+      try {
+          const response = await $api.get(`/ad/${id}/main_photo`);
+              const body = await response.data;
+              return await body.body;
+      }
+      catch {
+        return null
+      }
   }
 }
